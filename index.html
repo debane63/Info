@@ -1,250 +1,172 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>নাম্বার ডিটেইলস অনুসন্ধান</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Inter Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
-    <style>
-        /* ফন্ট হিসেবে Inter ব্যবহার করা হয়েছে */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0d1117; /* ডার্ক ব্যাকগ্রাউন্ড */
-            color: #c9d1d9; /* হালকা টেক্সট */
-        }
-        /* কাস্টম লোডিং স্পিনার */
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-top: 4px solid #38bdf8; /* উজ্জ্বল নীল */
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .card-bg {
-            background-color: #161b22; /* কার্ডের জন্য একটু হালকা ডার্ক */
-            border: 1px solid #30363d;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Number Lookup</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f0f4f8;
+}
+.container {
+    max-width: 550px;
+    margin: 50px auto;
+    background: #fff;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
+}
+.field {
+    position: relative;
+    margin-bottom: 20px;
+}
+.field input {
+    width: 100%;
+    padding: 15px 45px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    transition: 0.3s;
+    font-size: 16px;
+}
+.field input:focus {
+    border-color: #007bff;
+}
+.field i {
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    transform: translateY(-50%);
+    color: #007bff;
+}
+button.search-btn {
+    width: 100%;
+    padding: 15px;
+    background: #007bff;
+    color: #fff;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 18px;
+}
+button.search-btn:hover {
+    background: #0056b3;
+}
+#output {
+    margin-top: 20px;
+}
+.result-card, .error-card {
+    background: #e9f5ff;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    word-wrap: break-word;
+    opacity: 0; /* Animation Start */
+    transform: translateY(10px);
+    animation: fadeIn 0.5s ease forwards;
+}
+.error-card {
+    background: #ffe9e9;
+    color: #d8000c;
+}
+.result-card p {
+    margin: 8px 0;
+    line-height: 1.4;
+}
+.result-card i {
+    color: #007bff;
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+@keyframes fadeIn {
+    100% {opacity: 1; transform: translateY(0);}
+}
+.loading {
+    text-align: center;
+    font-size: 24px;
+    color: #007bff;
+    margin-top: 20px;
+}
+.loading i {
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg);}
+    100% { transform: rotate(360deg);}
+}
+</style>
 </head>
-<body class="p-4 md:p-8">
-
-    <div class="flex flex-col items-center justify-center min-h-screen">
-        <div class="w-full max-w-lg card-bg p-6 sm:p-8 rounded-xl shadow-2xl transition-all duration-300">
-
-            <!-- শিরোনাম -->
-            <h1 class="text-3xl font-extrabold text-white mb-6 text-center">নাম্বার ডিটেইলস অনুসন্ধান</h1>
-            <p class="text-gray-400 text-center mb-8">মোবাইল নম্বর লিখুন এবং তথ্য খুঁজুন</p>
-
-            <div class="space-y-4">
-                <!-- ইনপুট ফিল্ড -->
-                <input
-                    type="tel"
-                    id="mobileInput"
-                    placeholder="মোবাইল নম্বর লিখুন (যেমন: 01xxxxxxxxx)"
-                    class="w-full px-4 py-3 bg-[#0d1117] border border-[#30363d] rounded-lg focus:ring-sky-500 focus:border-sky-500 text-lg text-white placeholder-gray-500 transition duration-150"
-                    maxlength="11"
-                    pattern="[0-9]{11}"
-                >
-
-                <!-- অনুসন্ধান বাটন -->
-                <button
-                    id="searchButton"
-                    onclick="searchNumber()"
-                    class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded-lg text-lg shadow-lg shadow-sky-900/50 transition-all duration-200 transform hover:scale-[1.01] flex items-center justify-center"
-                >
-                    অনুসন্ধান করুন
-                </button>
-            </div>
-
-            <!-- লোডিং এবং মেসেজ এরিয়া -->
-            <div id="messageArea" class="mt-6 text-center">
-                <!-- মেসেজ এখানে প্রদর্শিত হবে -->
-            </div>
-
-            <!-- ফলাফলের কার্ড -->
-            <div id="resultsCard" class="mt-8 card-bg p-6 rounded-xl hidden">
-                <h2 class="text-xl font-bold border-b border-[#30363d] pb-3 mb-4 text-sky-400">অনুসন্ধানের ফলাফল</h2>
-                <div id="resultsContent" class="space-y-3">
-                    <!-- ডিটেইলস এখানে লোড হবে -->
-                </div>
-            </div>
-
-        </div>
+<body>
+<div class="container" id="top">
+    <h1><i class="fa-solid fa-magnifying-glass-chart"></i> Number Lookup</h1>
+    
+    <div class="field" id="mobileField">
+        <i class="fa-solid fa-phone"></i>
+        <input type="tel" id="mobile" placeholder="Enter 10-digit Mobile Number" maxlength="10">
     </div>
+    
+    <button class="search-btn" onclick="search()"><i class="fa-solid fa-search"></i> Search</button>
+    <div id="output"></div>
+</div>
 
-    <script type="text/javascript">
-        // Firebase-এর জন্য গ্লোবাল ভেরিয়েবলগুলি ডিক্লেয়ার করা হলো (যদিও এই অ্যাপে ব্যবহার করা হয়নি)
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const __initial_auth_token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : undefined;
+<script>
+function search() {
+    let mobile = document.getElementById('mobile').value.trim();
+    let output = document.getElementById('output');
+    
+    // 1. ইনপুট যাচাই
+    if (mobile.length !== 10 || !/^\d{10}$/.test(mobile)) {
+        output.innerHTML = '<div class="error-card"><i class="fa-solid fa-triangle-exclamation"></i> Please enter a valid 10-digit Mobile Number.</div>';
+        return;
+    }
 
-        // আপনার দেওয়া এপিআই ইউআরএল টেমপ্লেট
-        const API_BASE_URL = 'https://n2d.vercel.app/api?key=freeApi&number=';
+    // 2. লোডিং স্ট্যাটাস
+    output.innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i> Loading...</div>';
 
-        const mobileInput = document.getElementById('mobileInput');
-        const searchButton = document.getElementById('searchButton');
-        const messageArea = document.getElementById('messageArea');
-        const resultsCard = document.getElementById('resultsCard');
-        const resultsContent = document.getElementById('resultsContent');
+    // 3. ডেমো/নকল ডেটা দিয়ে রেজাল্ট দেখানোর জন্য setTimeout ব্যবহার করা হলো
+    // আসল API কল এইখানে যাবে, কিন্তু আমি ডেমো ডেটা ব্যবহার করছি।
+    setTimeout(() => {
+        // একটি নকল/ডেমো রেজাল্ট ডেটা
+        const mockResult = [{
+            name: "Rahul Sharma",
+            father_name: "Om Prakash Sharma",
+            mobile: mobile,
+            alt_mobile: "9876543210",
+            circle: "West Bengal",
+            aadhaar_number: "XXXX XXXX 1234",
+            address: "12/A, Park Street, Kolkata - 700016",
+            email: "rahul.s@example.com"
+        }];
 
-        /**
-         * মেসেজ ডিসপ্লে করার জন্য একটি কাস্টম ফাংশন, alert() এর পরিবর্তে ব্যবহৃত।
-         * @param {string} text - প্রদর্শিতব্য বার্তা।
-         * @param {string} type - 'success', 'error', বা 'loading'।
-         */
-        function displayMessage(text, type = 'info') {
-            messageArea.innerHTML = '';
-            let color = 'text-gray-400';
-            let icon = '';
-
-            if (type === 'error') {
-                color = 'text-red-400';
-                icon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
-            } else if (type === 'loading') {
-                color = 'text-sky-400';
-                icon = '<div class="spinner inline-block mr-2 align-middle"></div>';
-            } else if (type === 'success') {
-                color = 'text-green-400';
-                icon = '<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>';
-            }
-
-            messageArea.innerHTML = `<p class="flex items-center justify-center ${color} font-medium p-3 card-bg rounded-lg shadow-md">${icon} ${text}</p>`;
-        }
-
-        /**
-         * এপিআই থেকে ডেটা আনার প্রধান ফাংশন।
-         */
-        async function searchNumber() {
-            const mobile = mobileInput.value.trim();
-            resultsCard.classList.add('hidden');
-            resultsContent.innerHTML = '';
-
-            if (mobile === '') {
-                displayMessage('অনুগ্রহ করে একটি মোবাইল নম্বর লিখুন।', 'error');
-                return;
-            }
-
-            // সাধারণ ইনপুট ভ্যালিডেশন
-            if (!/^\d{11}$/.test(mobile)) {
-                displayMessage('দয়া করে ১১-সংখ্যার একটি বৈধ মোবাইল নম্বর দিন।', 'error');
-                return;
-            }
-
-            const apiUrl = `${API_BASE_URL}${mobile}`;
-            
-            // লোডিং অবস্থা দেখানো
-            displayMessage('অনুসন্ধান চলছে...', 'loading');
-            searchButton.disabled = true;
-            searchButton.classList.add('opacity-50', 'cursor-not-allowed');
-
-            try {
-                // এপিআই কল
-                const response = await fetchWithExponentialBackoff(apiUrl);
-                const data = await response.json();
-
-                if (!response.ok) {
-                    // যদি HTTP ত্রুটি হয় (যেমন 404, 500)
-                    throw new Error(data.message || `HTTP ত্রুটি: ${response.status}`);
-                }
-
-                // এপিআই রেসপন্স অনুযায়ী ফলাফল প্রদর্শন
-                if (data.status === 'success' && data.data) {
-                    displayResults(data.data);
-                    displayMessage('তথ্য সফলভাবে পাওয়া গেছে।', 'success');
-                } else if (data.status === 'error') {
-                    displayMessage(`ত্রুটি: ${data.message || 'অনুসন্ধান ফলপ্রসূ হয়নি।'}`, 'error');
-                } else {
-                    displayMessage('নির্দিষ্ট নম্বরের জন্য কোনো বিস্তারিত তথ্য পাওয়া যায়নি।', 'error');
-                }
-
-            } catch (error) {
-                console.error("API Call Error:", error);
-                displayMessage(`নেটওয়ার্ক বা ডেটা সংক্রান্ত সমস্যা: ${error.message || 'অজানা ত্রুটি'}`, 'error');
-            } finally {
-                // শেষ হলে বাটন সচল করা
-                searchButton.disabled = false;
-                searchButton.classList.remove('opacity-50', 'cursor-not-allowed');
-            }
-        }
-
-        /**
-         * এপিআই কল করার জন্য এক্সপোনেনশিয়াল ব্যাকঅফ লজিক
-         * @param {string} url - এপিআই ইউআরএল।
-         */
-        async function fetchWithExponentialBackoff(url, maxRetries = 3) {
-            for (let i = 0; i < maxRetries; i++) {
-                try {
-                    const response = await fetch(url);
-                    if (response.ok) {
-                        return response;
-                    }
-                    if (i === maxRetries - 1) {
-                        throw new Error(`সর্বাধিক ${maxRetries} বার চেষ্টার পরেও অনুরোধ ব্যর্থ হয়েছে।`);
-                    }
-                } catch (error) {
-                    // নেটওয়ার্ক ত্রুটি, রিকনফিগারের জন্য অপেক্ষা
-                    const delay = Math.pow(2, i) * 1000; // 1s, 2s, 4s
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                }
-            }
-            throw new Error("ফলাফল আনতে ব্যর্থ।");
-        }
-
-
-        /**
-         * প্রাপ্ত ডেটা ইউজার ইন্টারফেসে সুন্দরভাবে প্রদর্শন করে।
-         * API থেকে প্রাপ্ত ডেটার উপর ভিত্তি করে লেবেলগুলি বাংলায় লেখা হয়েছে।
-         * @param {object} data - এপিআই থেকে প্রাপ্ত ডেটা অবজেক্ট।
-         */
-        function displayResults(data) {
-            resultsCard.classList.remove('hidden');
-
-            const fieldMap = {
-                'operator': 'অপারেটর',
-                'name': 'নাম',
-                'location': 'অবস্থান',
-                'mobile_number': 'মোবাইল নম্বর',
-                'circle': 'সার্কেল (অঞ্চল)',
-                'port_status': 'পোর্ট স্ট্যাটাস',
-                // আরও কোনো ফিল্ড থাকলে এখানে যোগ করুন
-            };
-
-            let html = '';
-            
-            // ডেটার প্রতিটি কী-ভ্যালু পেয়ারের জন্য একটি আইটেম তৈরি
-            for (const key in data) {
-                if (Object.prototype.hasOwnProperty.call(data, key)) {
-                    const label = fieldMap[key] || key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' '); // ম্যাপ না থাকলে কী ব্যবহার করা হয়েছে
-                    const value = data[key] || 'অজানা';
-                    
-                    html += `
-                        <div class="flex justify-between items-start p-3 card-bg rounded-lg shadow-inner border border-[#30363d] transition-colors hover:border-sky-500">
-                            <span class="text-gray-400 font-medium">${label}:</span>
-                            <span class="text-white font-semibold text-right break-all">${value}</span>
-                        </div>
-                    `;
-                }
-            }
-
-            resultsContent.innerHTML = html;
-        }
-
-        // এন্টার চাপলে অনুসন্ধান ফাংশনটি কল করার জন্য ইভেন্ট লিসেনার
-        mobileInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                searchNumber();
-            }
+        let html = '';
+        mockResult.forEach(item => {
+            html += `<div class="result-card">
+                <p><i class="fa-solid fa-user"></i><strong>Name:</strong> ${item.name}</p>
+                <p><i class="fa-solid fa-user-pen"></i><strong>Father's Name:</strong> ${item.father_name}</p>
+                <p><i class="fa-solid fa-phone"></i><strong>Mobile:</strong> ${item.mobile}</p>
+                <p><i class="fa-solid fa-phone-volume"></i><strong>Alt Mobile:</strong> ${item.alt_mobile}</p>
+                <p><i class="fa-solid fa-signal"></i><strong>Circle:</strong> ${item.circle}</p>
+                <p><i class="fa-solid fa-id-card"></i><strong>Aadhaar:</strong> ${item.aadhaar_number}</p>
+                <p><i class="fa-solid fa-location-dot"></i><strong>Address:</strong> ${item.address}</p>
+                <p><i class="fa-solid fa-envelope"></i><strong>Email:</strong> ${item.email}</p>
+            </div>`;
         });
-        
-    </script>
+        output.innerHTML = html;
+
+    }, 1500); // 1.5 সেকেন্ডের পরে রেজাল্ট দেখাবে
+}
+</script>
 </body>
 </html>
-
