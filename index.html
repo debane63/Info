@@ -1,243 +1,614 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>3D Premium Lookup Console</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>NUMBER TO LOOKUP</title>
 
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;900&family=Space+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@600&display=swap" rel="stylesheet">
 
 <style>
-:root {
-  --accent: #00ffaa;
-  --bg: #000;
-  --text: #eafff7;
-  --shadow: rgba(0,255,170,0.6);
-}
-*{box-sizing:border-box;}
-body{
-  margin:0;
-  font-family:'Space Mono',monospace;
-  background:radial-gradient(circle at center, #020202, #000);
-  color:var(--text);
-  height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-  perspective:1200px;
-}
-.voxel-field{
-  position:fixed;
-  top:50%; left:50%;
-  width:100%; height:100%;
-  transform-style:preserve-3d;
-  transform:translate(-50%,-50%) rotateX(60deg);
-  z-index:0;
-}
-.voxel{
-  position:absolute;
-  width:2px; height:2px;
-  background:var(--accent);
-  box-shadow:0 0 10px var(--accent);
-  opacity:0;
-  animation:stream linear infinite;
-}
-@keyframes stream{
-  0%{transform:translateZ(0);opacity:0;}
-  10%{opacity:1;}
-  90%{opacity:1;}
-  100%{transform:translateZ(4000px);opacity:0;}
-}
-.container{
-  position:relative;
-  z-index:10;
-  background:rgba(10,10,10,0.8);
-  border-radius:16px;
-  padding:30px;
-  width:90%;
-  max-width:420px;
-  text-align:center;
-  box-shadow:0 0 25px var(--shadow);
-  backdrop-filter:blur(8px);
-  animation:float 8s ease-in-out infinite alternate;
-}
-@keyframes float{
-  from{transform:translateY(0);}
-  to{transform:translateY(-8px);}
-}
-h1{
-  font-family:'Orbitron',sans-serif;
-  color:var(--accent);
-  text-shadow:0 0 15px var(--shadow);
-  margin-bottom:25px;
-}
-.field{
-  display:flex;
-  align-items:center;
-  background:#111;
-  border:1px solid #333;
-  border-radius:10px;
-  padding:10px 15px;
-  margin-bottom:20px;
-}
-.field i{color:var(--accent);margin-right:10px;}
-.field input{
-  flex:1;
-  background:transparent;
-  border:none;
-  outline:none;
-  color:var(--text);
-  font-size:16px;
-}
-button.search-btn{
-  width:100%;
-  padding:15px;
-  border:none;
-  border-radius:10px;
-  background:var(--accent);
-  color:#000;
-  font-weight:700;
-  font-size:16px;
-  box-shadow:0 0 25px var(--shadow);
-  cursor:pointer;
-  transition:transform .3s,box-shadow .3s;
-}
-button.search-btn:hover{
-  transform:translateZ(20px) scale(1.03);
-  box-shadow:0 0 40px var(--shadow);
-}
-.result-card, .error-card{
-  margin-top:20px;
-  padding:15px;
-  border-radius:10px;
-  background:rgba(20,20,20,0.8);
-  border-left:4px solid var(--accent);
-  box-shadow:0 0 15px rgba(0,0,0,0.6);
-  animation:fadeIn 1s ease forwards;
-}
-.error-card{color:#ff7777;border-left-color:#ff4444;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-@keyframes spin{from{transform:rotate(0);}to{transform:rotate(360deg);}}
+  :root{
+    --bg-dark: #000;
+    --card-bg: rgba(12,14,18,0.85);
+    --glass-border: rgba(255,255,255,0.08);
+    --accent-1: #00e6c3;
+    --accent-2: #007bff;
+    --accent-3: #ff007f;
+    --accent-4: #ffd200;
+    --accent-5: #9d4edd;
+    --muted: #88a9a1;
+    --text: #e9fff7;
+    --radius: 24px;
+    --transition: 300ms cubic-bezier(.2,.9,.2,1);
+    --shadow-3d: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background:var(--bg-dark);
+    color:var(--text);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    overflow:hidden;
+    perspective: 1000px;
+  }
+
+  /* Advanced 3D background with particles */
+  .bg-3d {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -5;
+    background: radial-gradient(ellipse at center, #0a0e17 0%, #000000 70%);
+    overflow: hidden;
+  }
+  
+  .particles {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .particle {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    animation: float 20s infinite linear;
+  }
+  
+  @keyframes float {
+    0% {
+      transform: translate3d(0, 0, 0) rotate(0deg);
+    }
+    100% {
+      transform: translate3d(100px, 100px, 100px) rotate(360deg);
+    }
+  }
+
+  /* Real-time animated gradient background (smooth flow) */
+  .bg-animated{
+    position:fixed; inset:0; z-index:-4;
+    background: linear-gradient(120deg, rgba(0,230,195,0.08), rgba(0,123,255,0.08), rgba(255,0,127,0.06), rgba(255,210,0,0.05));
+    background-size: 800% 800%;
+    animation: bgFlow 28s linear infinite;
+    filter: blur(12px) saturate(120%);
+    pointer-events:none;
+  }
+  @keyframes bgFlow{
+    0%{background-position:0% 50%}
+    25%{background-position:50% 50%}
+    50%{background-position:100% 50%}
+    75%{background-position:50% 50%}
+    100%{background-position:0% 50%}
+  }
+
+  /* Multiple soft circular flares that move independently */
+  .flare{
+    position:fixed; border-radius:50%; filter:blur(70px); opacity:0.45; z-index:-3; pointer-events:none;
+    mix-blend-mode:screen;
+  }
+  .f1{ width:320px; height:320px; left:4%; top:8%; background: radial-gradient(circle, var(--accent-1), transparent 40%); animation: f1move 18s ease-in-out infinite; }
+  .f2{ width:280px; height:280px; right:3%; top:22%; background: radial-gradient(circle, var(--accent-2), transparent 40%); animation: f2move 20s ease-in-out infinite; }
+  .f3{ width:300px; height:300px; left:60%; top:60%; background: radial-gradient(circle, var(--accent-3), transparent 40%); animation: f3move 22s ease-in-out infinite; }
+  .f4{ width:240px; height:240px; left:8%; bottom:6%; background: radial-gradient(circle, var(--accent-4), transparent 40%); animation: f4move 24s ease-in-out infinite; }
+  .f5{ width:320px; height:320px; right:10%; bottom:10%; background: radial-gradient(circle, var(--accent-5), transparent 40%); animation: f5move 26s ease-in-out infinite; }
+
+  @keyframes f1move { 0%{transform: translate3d(0,0,0)} 50%{transform: translate3d(40px,-30px,20px)} 100%{transform: translate3d(0,0,0)} }
+  @keyframes f2move { 0%{transform: translate3d(0,0,0)} 50%{transform: translate3d(-30px,40px,-15px)} 100%{transform: translate3d(0,0,0)} }
+  @keyframes f3move { 0%{transform: translate3d(0,0,0)} 50%{transform: translate3d(-40px,-20px,10px)} 100%{transform: translate3d(0,0,0)} }
+  @keyframes f4move { 0%{transform: translate3d(0,0,0)} 50%{transform: translate3d(20px,-40px,-25px)} 100%{transform: translate3d(0,0,0)} }
+  @keyframes f5move { 0%{transform: translate3d(0,0,0)} 50%{transform: translate3d(30px,20px,15px)} 100%{transform: translate3d(0,0,0)} }
+
+  /* Shell: central container with 3D effect */
+  .shell{
+    width:100%; max-width:400px; display:flex; flex-direction: column;
+    align-items:center;
+    transform-style: preserve-3d;
+    gap: 20px;
+  }
+
+  /* Main lookup card with iPhone-like glass effect */
+  .card{
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius);
+    padding:24px;
+    border:1px solid rgba(255,255,255,0.15);
+    box-shadow: 
+      var(--shadow-3d), 
+      0 0 0 1px rgba(255,255,255,0.03) inset,
+      0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    transform-style: preserve-3d;
+    transform: translateZ(10px);
+    transition: transform var(--transition), box-shadow var(--transition);
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+  }
+  
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    z-index: 2;
+  }
+  
+  .card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Title + small subtitle */
+  .heading{
+    display:flex; gap:14px; align-items:center; margin-bottom:20px;
+    transform: translateZ(20px);
+  }
+  
+  .logo{
+    width:60px;height:60px;border-radius:18px;display:grid;place-items:center;
+    background: conic-gradient(from 0deg, var(--accent-1), var(--accent-2), var(--accent-3), var(--accent-4), var(--accent-5));
+    color:#001; font-weight:700; font-family:'Orbitron', sans-serif; font-size:20px; 
+    box-shadow: 
+      inset 0 6px 18px rgba(0,0,0,0.45), 
+      0 8px 20px rgba(0,0,0,0.3),
+      0 0 0 1px rgba(255,255,255,0.1);
+    transform: translateZ(30px);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .logo::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(to bottom right, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 50%);
+    transform: rotate(30deg);
+  }
+  
+  .logo i {
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+  }
+  
+  .title {
+    font-weight:700; font-size:20px; color:var(--accent-1); letter-spacing:0.8px;
+    text-shadow: 0 2px 10px rgba(0,230,195,0.3);
+  }
+  .subtitle { font-size:14px; color:var(--muted); margin-top:4px; }
+
+  /* Input row with 3D effect */
+  .search-row{ display:flex; gap:12px; align-items:center; margin-bottom:16px; }
+  .input {
+    flex:1; display:flex; gap:12px; align-items:center;
+    background: rgba(6,8,10,0.7); padding:16px; border-radius:18px; 
+    border:1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.03) inset;
+    transform: translateZ(5px);
+    transition: all var(--transition);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .input::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+    transition: left 0.5s ease;
+  }
+  
+  .input:focus-within::before {
+    left: 100%;
+  }
+  
+  .input i { color: var(--accent-1); font-size:20px; text-shadow: 0 0 10px rgba(0,230,195,0.5); }
+  .input input{
+    border:none; outline:none; background:transparent; color:var(--text);
+    font-size:16px; width:100%;
+    text-shadow: 0 0 5px rgba(255,255,255,0.1);
+  }
+  .input input::placeholder{ color: #7faea4; }
+
+  .btn{
+    padding:16px 20px; border-radius:18px; border:none; font-weight:700; cursor:pointer;
+    background: linear-gradient(135deg, var(--accent-1), var(--accent-2), var(--accent-3));
+    color:#001; 
+    box-shadow: 0 12px 30px rgba(0,0,0,0.5), 0 4px 10px rgba(0,0,0,0.3);
+    transition: transform var(--transition), box-shadow var(--transition);
+    transform: translateZ(10px);
+    position: relative;
+    overflow: hidden;
+    font-size: 16px;
+  }
+  
+  .btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+  }
+  
+  .btn:hover::before {
+    left: 100%;
+  }
+  
+  .btn:active{ transform: translateZ(5px) scale(.98); }
+
+  /* Info panel with 3D effect */
+  .info-panel {
+    background: rgba(255,255,255,0.05);
+    border-radius:var(--radius); padding:18px; border:1px solid rgba(255,255,255,0.1);
+    display:flex; flex-direction:column; gap:12px; align-items:flex-start;
+    box-shadow: var(--shadow-3d), 0 0 0 1px rgba(255,255,255,0.02) inset;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    transform: translateZ(5px);
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+  }
+  
+  .info-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  .info-panel small { color:var(--muted); font-size:14px; }
+  .info-panel .hint { font-weight:700; color:var(--text); font-size:16px; margin-bottom:8px; }
+
+  /* Scrollable results container */
+  .results-container {
+    max-height: 400px;
+    overflow-y: auto;
+    width: 100%;
+    margin-top: 16px;
+    padding-right: 5px;
+  }
+  
+  /* Custom scrollbar */
+  .results-container::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .results-container::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+  }
+  
+  .results-container::-webkit-scrollbar-thumb {
+    background: var(--accent-1);
+    border-radius: 10px;
+  }
+  
+  .results-container::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-2);
+  }
+
+  /* Professional result panel (grouped, 3D glass cards) */
+  .results-wrap{
+    display:flex; flex-direction:column; gap:16px;
+  }
+  .result-card{
+    background: rgba(255,255,255,0.05);
+    border-radius:var(--radius); padding:18px; border:1px solid rgba(255,255,255,0.1);
+    box-shadow: var(--shadow-3d), 0 0 0 1px rgba(255,255,255,0.02) inset;
+    transform-origin:center;
+    transform: translateZ(0) rotateX(5deg);
+    opacity:0; 
+    translate: 0 10px;
+    transition: opacity 420ms ease, transform 420ms ease, box-shadow 200ms ease;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+  }
+  
+  .result-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  .result-card.visible{ 
+    opacity:1; 
+    transform: translateZ(15px) rotateX(0deg) translateY(0); 
+  }
+  
+  .result-card:hover {
+    transform: translateZ(20px) rotateX(0deg);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.03) inset;
+  }
+
+  .result-header{
+    display:flex; justify-content:space-between; gap:10px; align-items:center; margin-bottom:14px;
+    position: relative;
+    z-index: 2;
+  }
+  .result-title{ font-weight:700; color:var(--accent-2); font-size:16px; text-shadow: 0 2px 8px rgba(0,123,255,0.3); }
+  .result-meta{ font-size:13px; color:var(--muted); }
+
+  .group{
+    display:grid; grid-template-columns: 1fr; gap:10px; align-items:center;
+    padding-top:10px; padding-bottom:10px; border-top:1px dashed rgba(255,255,255,0.05);
+    position: relative;
+    z-index: 2;
+  }
+  
+  .group-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+  }
+  
+  .group .k{ color:var(--muted); font-size:14px; }
+  .group .v{ color:var(--text); font-weight:700; font-size:15px; text-shadow: 0 1px 5px rgba(255,255,255,0.1); text-align: right; }
+
+  /* subtle helper + loader */
+  .notice{ font-size:14px; color:var(--muted); text-align:center; margin-top:10px; }
+  .loader{
+    width:26px;height:26px;border-radius:50%;
+    border:3px solid rgba(255,255,255,0.07); border-top:3px solid var(--accent-1);
+    animation:spin 1s linear infinite;
+    box-shadow: 0 0 15px rgba(0,230,195,0.3);
+  }
+  @keyframes spin{100%{transform:rotate(360deg)}}
+  
+  /* Desktop hiding */
+  @media (min-width: 768px) {
+    body::before {
+      content: "This interface is optimized for mobile devices only. Please view on a smartphone.";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      font-size: 18px;
+      text-align: center;
+      padding: 20px;
+    }
+  }
 </style>
 </head>
-
 <body>
-<body>
-  <!-- এখানে তোমার 3D ব্যাকগ্রাউন্ড, ইনপুট ফিল্ড ইত্যাদি থাকবে -->
 
-  <!-- 🎵 Background Music Button -->
-  <button id="musicBtn" 
-  style="position:fixed;bottom:20px;right:20px;z-index:9999;
-  background:#00ffaa;color:#000;border:none;border-radius:50%;
-  width:60px;height:60px;font-size:22px;
-  box-shadow:0 0 20px rgba(0,255,170,0.6);cursor:pointer;">
-    🎵
-  </button>
-
-  <audio id="bgMusic" loop>
-    <source src="music.mp3" type="audio/mpeg">
-  </audio>
-
-  <script>
-    const music = document.getElementById('bgMusic');
-    const btn = document.getElementById('musicBtn');
-    let playing = false;
-
-    btn.addEventListener('click', () => {
-      if(!playing){
-        music.play();
-        playing = true;
-        btn.innerText = '⏸️';
-      } else {
-        music.pause();
-        playing = false;
-        btn.innerText = '🎵';
-      }
-    });
-  </script>
-
-  <!-- 🎵 এখানেই কোড শেষ -->
-</body>
-
-<!-- 3D Background -->
-<div class="voxel-field" id="voxel-field"></div>
-
-<div class="container">
-  <h1><i class="fa-solid fa-cloud-arrow-up"></i> DATA LOOKUP</h1>
-  <div class="field">
-    <i class="fa-solid fa-mobile-screen-button"></i>
-    <input type="tel" id="mobile" placeholder="Enter 10-digit Mobile Number" maxlength="10">
+  <div class="bg-3d" aria-hidden="true">
+    <div class="particles" id="particles"></div>
   </div>
-  <button class="search-btn" onclick="searchData()">LOOKUP</button>
-  <div id="output"></div>
-</div>
+  <div class="bg-animated" aria-hidden="true"></div>
+  <div class="flare f1" aria-hidden="true"></div>
+  <div class="flare f2" aria-hidden="true"></div>
+  <div class="flare f3" aria-hidden="true"></div>
+  <div class="flare f4" aria-hidden="true"></div>
+  <div class="flare f5" aria-hidden="true"></div>
+
+  <div class="shell" role="main" aria-label="Number lookup app">
+    <!-- Main Lookup Card -->
+    <section class="card" aria-labelledby="lookupTitle">
+      <div class="heading">
+        <div class="logo" aria-hidden="true"><i class="fa-solid fa-magnifying-glass" style="font-size:22px;color:#001;"></i></div>
+        <div>
+          <div id="lookupTitle" class="title">NUMBER LOOKUP</div>
+          <div class="subtitle">Enter 10-digit mobile number</div>
+        </div>
+      </div>
+
+      <div class="search-row" role="search">
+        <div class="input" aria-hidden="false">
+          <i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i>
+          <input id="mobileNumber" type="tel" inputmode="numeric" maxlength="10" aria-label="Mobile number input" placeholder="10-digit phone number">
+        </div>
+        <button id="searchBtn" class="btn" aria-label="Lookup">Search</button>
+      </div>
+
+      <div class="results-container">
+        <div id="resultsWrap" class="results-wrap" aria-live="polite" aria-atomic="true">
+          <!-- Result cards will be injected here -->
+        </div>
+      </div>
+
+      <div class="notice">© Secure Lookup</div>
+    </section>
+
+    <!-- Info Panel -->
+    <aside class="info-panel" aria-label="info panel">
+      <div class="hint">Quick tips</div>
+      <small>• Enter a valid 10-digit mobile number</small>
+      <small>• Results show personal & SIM details</small>
+      <small>• Data depends on lookup API availability</small>
+      <div style="margin-top:auto;font-size:13px;color:var(--muted)">Secure • Mobile Only</div>
+    </aside>
+  </div>
 
 <script>
-/* --- Voxel particles --- */
-const field=document.getElementById('voxel-field');
-const COUNT=500;
-const SIZE=4000;
-for(let i=0;i<COUNT;i++){
-  const v=document.createElement('div');
-  v.className='voxel';
-  const x=(Math.random()-0.5)*SIZE;
-  const y=(Math.random()-0.5)*SIZE;
-  const z=-(Math.random()*2000);
-  v.style.transform=`translate3d(${x}px,${y}px,${z}px)`;
-  v.style.animationDuration=`${Math.random()*20+10}s`;
-  v.style.animationDelay=`${Math.random()*5}s`;
-  field.appendChild(v);
+/* Utility to escape HTML */
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[c]));
 }
-/* --- Smooth parallax motion --- */
-let tX=0,tY=0,cX=0,cY=0;
-function update(){
-  cX+=(tX-cX)*0.08;
-  cY+=(tY-cY)*0.08;
-  field.style.transform=`translate(-50%,-50%) rotateX(${60-cY}deg) rotateY(${cX}deg)`;
-  requestAnimationFrame(update);
-}
-update();
-window.addEventListener('deviceorientation',e=>{
-  tX=(e.gamma||0)/2;
-  tY=(e.beta||0)/3;
-});
-window.addEventListener('mousemove',e=>{
-  tX=(e.clientX/window.innerWidth-0.5)*20;
-  tY=(e.clientY/window.innerHeight-0.5)*20;
-});
 
-/* --- API lookup --- */
-async function searchData(){
-  const num=document.getElementById('mobile').value.trim();
-  const out=document.getElementById('output');
-  if(!/^\d{10}$/.test(num)){
-    out.innerHTML='<div class="error-card">Enter a valid 10-digit number.</div>';
+/* Create 3D particles */
+function createParticles() {
+  const particlesContainer = document.getElementById('particles');
+  const particleCount = 30;
+  
+  for (let i = 0; i < particleCount; i++) {
+    const particle = document.createElement('div');
+    particle.classList.add('particle');
+    
+    // Random properties
+    const size = Math.random() * 4 + 1;
+    const posX = Math.random() * 100;
+    const posY = Math.random() * 100;
+    const delay = Math.random() * 20;
+    const duration = Math.random() * 20 + 10;
+    
+    particle.style.width = `${size}px`;
+    particle.style.height = `${size}px`;
+    particle.style.left = `${posX}%`;
+    particle.style.top = `${posY}%`;
+    particle.style.animationDelay = `${delay}s`;
+    particle.style.animationDuration = `${duration}s`;
+    
+    particlesContainer.appendChild(particle);
+  }
+}
+
+/* Elements */
+const searchBtn = document.getElementById('searchBtn');
+const mobileInput = document.getElementById('mobileNumber');
+const resultsWrap = document.getElementById('resultsWrap');
+
+/* Event wiring */
+searchBtn.addEventListener('click', onSearch);
+mobileInput.addEventListener('keydown', (e)=> { if(e.key === 'Enter') onSearch(); });
+
+/* Main lookup flow */
+function onSearch(){
+  const v = mobileInput.value.trim();
+  if(!/^\d{10}$/.test(v)){
+    showError('Enter a valid 10-digit number');
     return;
   }
-  out.innerHTML='<div style="text-align:center;color:var(--accent)"><i class="fa-solid fa-spinner" style="animation:spin 1s linear infinite"></i> Fetching Data...</div>';
-  try{
-    const res=await fetch(`https://n2d.vercel.app/api?key=freeApi&number=${num}`);
-    const data=await res.json();
-    if(data.status==='success'&&data.data&&data.data.length){
-      const i=data.data[0];
-      out.innerHTML=`
-      <div class="result-card">
-        <p><strong>Name:</strong> ${i.name||'N/A'}</p>
-        <p><strong>Father's Name:</strong> ${i.father_name||'N/A'}</p>
-        <p><strong>Mobile:</strong> ${i.mobile||'N/A'}</p>
-        <p><strong>Aadhaar:</strong> ${i.aadhaar_number||'N/A'}</p>
-        <p><strong>Circle:</strong> ${i.circle||'N/A'}</p>
-        <p><strong>Address:</strong> ${i.address||'N/A'}</p>
-      </div>`;
-    }else{
-      out.innerHTML='<div class="error-card">No data found.</div>';
-    }
-  }catch(err){
-    out.innerHTML=`<div class="error-card">Error: ${err.message}</div>`;
-  }
+  fetchLookup(v);
 }
-</script>
-</body>
-</html>
+
+/* show loader */
+function showLoader(){
+  resultsWrap.innerHTML = '';
+  const loaderCard = document.createElement('div');
+  loaderCard.className = 'result-card visible';
+  loaderCard.innerHTML = `<div style="display:flex;gap:14px;align-items:center"><div class="loader" aria-hidden="true"></div><div style="color:var(--muted)">Fetching results…</div></div>`;
+  resultsWrap.appendChild(loaderCard);
+}
+
+/* show error card */
+function showError(msg){
+  resultsWrap.innerHTML = '';
+  const card = document.createElement('div');
+  card.className = 'result-card visible';
+  card.innerHTML = `
+    <div class="result-header">
+      <div class="result-title">No results</div>
+      <div class="result-meta">lookup</div>
+    </div>
+    <div class="group">
+      <div class="group-row">
+        <div class="k">Error</div>
+        <div class="v">${escapeHtml(msg)}</div>
+      </div>
+    </div>
+  `;
+  resultsWrap.appendChild(card);
+}
+
+/* Render professional, grouped card(s) with staggered animation */
+function renderResults(items){
+  resultsWrap.innerHTML = '';
+  // items is expected to be an array (one or many)
+  items.forEach((it, idx) => {
+    const card = document.createElement('article');
+    card.className = 'result-card';
+    // timestamp meta
+    const metaTime = new Date().toLocaleString();
+    card.innerHTML = `
+      <div class="result-header">
+        <div class="result-title">Lookup result</div>
+        <div class="result-meta">${escapeHtml(it.mobile||'—')} • ${metaTime}</div>
+      </div>
+
+      <div class="group">
+        <div class="group-row">
+          <div class="k">Name</div>
+          <div class="v">${escapeHtml(it.name||'N/A')}</div>
+        </div>
+        <div class="group-row">
+          <div class="k">Father</div>
+          <div class="v">${escapeHtml(it.father_name||'N/A')}</div>
+        </div>
+        <div class="group-row">
+          <div class="k">Mother</div>
+          <div class="v">${escapeHtml(it.mother_name||'N/A')}</div>
+        </div>
+        <div class="group-row">
+          <div class="k">DOB</div>
+          <div class="v">${escapeHtml(it.dob||'N/A')}</div>
+        </div>
+      </div>
+      
+      <div class="group">
+        <div class="group-row">
+          <div class="k">Gender</div>
+          <div class="v">${escapeHtml(it.gender||'N/A')}</div>
+        </div>
+        <div class="group-row">
+          <div class="k">Aadhaar</div>
+          <div class="v">${escapeHtml(it.aadhaar_number||'Not Linked')}</div>
+        </div>
+        <div class="group-row">
+          <div class="k">Email</div>
+          <div class="v">${escapeHtml(it.email||'N/A')}</div>
+        </div>
+        <div class="group-row">
+          <div class="k">SIM Type</div>
+          <div class="v">${escapeHtml(it.sim_type||'N/A')}</div>
+        </div>
+      </div>
+
+      <div class="group">
+        <div class="group-row">
+          <div class="k">Circle</div>
+          <div class="v">${escapeHtml(it.circle||'N/A')}</div>
+        </div>
+        <div class="group-row">
+          <div class="k">Registered On</div>
+          <div class="v">${escapeHtml(it.r
