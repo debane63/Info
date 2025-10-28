@@ -3,169 +3,208 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Number Lookup</title>
+<title>3D Premium Lookup Console</title>
+
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;900&family=Space+Mono&display=swap" rel="stylesheet">
+
 <style>
-body {
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f0f4f8;
+:root {
+  --accent: #00ffaa;
+  --bg: #000;
+  --text: #eafff7;
+  --shadow: rgba(0,255,170,0.6);
 }
-.container {
-    max-width: 550px;
-    margin: 50px auto;
-    background: #fff;
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  font-family:'Space Mono',monospace;
+  background:radial-gradient(circle at center, #020202, #000);
+  color:var(--text);
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  perspective:1200px;
 }
-h1 {
-    text-align: center;
-    color: #333;
-    margin-bottom: 30px;
+.voxel-field{
+  position:fixed;
+  top:50%; left:50%;
+  width:100%; height:100%;
+  transform-style:preserve-3d;
+  transform:translate(-50%,-50%) rotateX(60deg);
+  z-index:0;
 }
-.field {
-    position: relative;
-    margin-bottom: 20px;
+.voxel{
+  position:absolute;
+  width:2px; height:2px;
+  background:var(--accent);
+  box-shadow:0 0 10px var(--accent);
+  opacity:0;
+  animation:stream linear infinite;
 }
-.field input {
-    width: 100%;
-    padding: 15px 45px;
-    border-radius: 10px;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-    transition: 0.3s;
-    font-size: 16px;
+@keyframes stream{
+  0%{transform:translateZ(0);opacity:0;}
+  10%{opacity:1;}
+  90%{opacity:1;}
+  100%{transform:translateZ(4000px);opacity:0;}
 }
-.field input:focus {
-    border-color: #007bff;
+.container{
+  position:relative;
+  z-index:10;
+  background:rgba(10,10,10,0.8);
+  border-radius:16px;
+  padding:30px;
+  width:90%;
+  max-width:420px;
+  text-align:center;
+  box-shadow:0 0 25px var(--shadow);
+  backdrop-filter:blur(8px);
+  animation:float 8s ease-in-out infinite alternate;
 }
-.field i {
-    position: absolute;
-    top: 50%;
-    left: 15px;
-    transform: translateY(-50%);
-    color: #007bff;
+@keyframes float{
+  from{transform:translateY(0);}
+  to{transform:translateY(-8px);}
 }
-button.search-btn {
-    width: 100%;
-    padding: 15px;
-    background: #007bff;
-    color: #fff;
-    font-weight: bold;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: 0.3s;
-    font-size: 18px;
+h1{
+  font-family:'Orbitron',sans-serif;
+  color:var(--accent);
+  text-shadow:0 0 15px var(--shadow);
+  margin-bottom:25px;
 }
-button.search-btn:hover {
-    background: #0056b3;
+.field{
+  display:flex;
+  align-items:center;
+  background:#111;
+  border:1px solid #333;
+  border-radius:10px;
+  padding:10px 15px;
+  margin-bottom:20px;
 }
-#output {
-    margin-top: 20px;
+.field i{color:var(--accent);margin-right:10px;}
+.field input{
+  flex:1;
+  background:transparent;
+  border:none;
+  outline:none;
+  color:var(--text);
+  font-size:16px;
 }
-.result-card, .error-card {
-    background: #e9f5ff;
-    padding: 20px;
-    border-radius: 15px;
-    margin-bottom: 15px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-    word-wrap: break-word;
-    opacity: 0; /* Animation Start */
-    transform: translateY(10px);
-    animation: fadeIn 0.5s ease forwards;
+button.search-btn{
+  width:100%;
+  padding:15px;
+  border:none;
+  border-radius:10px;
+  background:var(--accent);
+  color:#000;
+  font-weight:700;
+  font-size:16px;
+  box-shadow:0 0 25px var(--shadow);
+  cursor:pointer;
+  transition:transform .3s,box-shadow .3s;
 }
-.error-card {
-    background: #ffe9e9;
-    color: #d8000c;
+button.search-btn:hover{
+  transform:translateZ(20px) scale(1.03);
+  box-shadow:0 0 40px var(--shadow);
 }
-.result-card p {
-    margin: 8px 0;
-    line-height: 1.4;
+.result-card, .error-card{
+  margin-top:20px;
+  padding:15px;
+  border-radius:10px;
+  background:rgba(20,20,20,0.8);
+  border-left:4px solid var(--accent);
+  box-shadow:0 0 15px rgba(0,0,0,0.6);
+  animation:fadeIn 1s ease forwards;
 }
-.result-card i {
-    color: #007bff;
-    margin-right: 10px;
-    width: 20px;
-    text-align: center;
-}
-@keyframes fadeIn {
-    100% {opacity: 1; transform: translateY(0);}
-}
-.loading {
-    text-align: center;
-    font-size: 24px;
-    color: #007bff;
-    margin-top: 20px;
-}
-.loading i {
-    animation: spin 1s linear infinite;
-}
-@keyframes spin {
-    0% { transform: rotate(0deg);}
-    100% { transform: rotate(360deg);}
-}
+.error-card{color:#ff7777;border-left-color:#ff4444;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+@keyframes spin{from{transform:rotate(0);}to{transform:rotate(360deg);}}
 </style>
 </head>
+
 <body>
-<div class="container" id="top">
-    <h1><i class="fa-solid fa-magnifying-glass-chart"></i> Number Lookup</h1>
-    
-    <div class="field" id="mobileField">
-        <i class="fa-solid fa-phone"></i>
-        <input type="tel" id="mobile" placeholder="Enter 10-digit Mobile Number" maxlength="10">
-    </div>
-    
-    <button class="search-btn" onclick="search()"><i class="fa-solid fa-search"></i> Search</button>
-    <div id="output"></div>
+<!-- 🎵 Background Music -->
+<audio autoplay loop>
+  <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<!-- 3D Background -->
+<div class="voxel-field" id="voxel-field"></div>
+
+<div class="container">
+  <h1><i class="fa-solid fa-cloud-arrow-up"></i> DATA LOOKUP</h1>
+  <div class="field">
+    <i class="fa-solid fa-mobile-screen-button"></i>
+    <input type="tel" id="mobile" placeholder="Enter 10-digit Mobile Number" maxlength="10">
+  </div>
+  <button class="search-btn" onclick="searchData()">LOOKUP</button>
+  <div id="output"></div>
 </div>
 
 <script>
-function search() {
-    let mobile = document.getElementById('mobile').value.trim();
-    let output = document.getElementById('output');
-    
-    // 1. ইনপুট যাচাই
-    if (mobile.length !== 10 || !/^\d{10}$/.test(mobile)) {
-        output.innerHTML = '<div class="error-card"><i class="fa-solid fa-triangle-exclamation"></i> Please enter a valid 10-digit Mobile Number.</div>';
-        return;
+/* --- Voxel particles --- */
+const field=document.getElementById('voxel-field');
+const COUNT=500;
+const SIZE=4000;
+for(let i=0;i<COUNT;i++){
+  const v=document.createElement('div');
+  v.className='voxel';
+  const x=(Math.random()-0.5)*SIZE;
+  const y=(Math.random()-0.5)*SIZE;
+  const z=-(Math.random()*2000);
+  v.style.transform=`translate3d(${x}px,${y}px,${z}px)`;
+  v.style.animationDuration=`${Math.random()*20+10}s`;
+  v.style.animationDelay=`${Math.random()*5}s`;
+  field.appendChild(v);
+}
+/* --- Smooth parallax motion --- */
+let tX=0,tY=0,cX=0,cY=0;
+function update(){
+  cX+=(tX-cX)*0.08;
+  cY+=(tY-cY)*0.08;
+  field.style.transform=`translate(-50%,-50%) rotateX(${60-cY}deg) rotateY(${cX}deg)`;
+  requestAnimationFrame(update);
+}
+update();
+window.addEventListener('deviceorientation',e=>{
+  tX=(e.gamma||0)/2;
+  tY=(e.beta||0)/3;
+});
+window.addEventListener('mousemove',e=>{
+  tX=(e.clientX/window.innerWidth-0.5)*20;
+  tY=(e.clientY/window.innerHeight-0.5)*20;
+});
+
+/* --- API lookup --- */
+async function searchData(){
+  const num=document.getElementById('mobile').value.trim();
+  const out=document.getElementById('output');
+  if(!/^\d{10}$/.test(num)){
+    out.innerHTML='<div class="error-card">Enter a valid 10-digit number.</div>';
+    return;
+  }
+  out.innerHTML='<div style="text-align:center;color:var(--accent)"><i class="fa-solid fa-spinner" style="animation:spin 1s linear infinite"></i> Fetching Data...</div>';
+  try{
+    const res=await fetch(`https://n2d.vercel.app/api?key=freeApi&number=${num}`);
+    const data=await res.json();
+    if(data.status==='success'&&data.data&&data.data.length){
+      const i=data.data[0];
+      out.innerHTML=`
+      <div class="result-card">
+        <p><strong>Name:</strong> ${i.name||'N/A'}</p>
+        <p><strong>Father's Name:</strong> ${i.father_name||'N/A'}</p>
+        <p><strong>Mobile:</strong> ${i.mobile||'N/A'}</p>
+        <p><strong>Aadhaar:</strong> ${i.aadhaar_number||'N/A'}</p>
+        <p><strong>Circle:</strong> ${i.circle||'N/A'}</p>
+        <p><strong>Address:</strong> ${i.address||'N/A'}</p>
+      </div>`;
+    }else{
+      out.innerHTML='<div class="error-card">No data found.</div>';
     }
-
-    // 2. লোডিং স্ট্যাটাস
-    output.innerHTML = '<div class="loading"><i class="fa-solid fa-spinner"></i> Loading...</div>';
-
-    // 3. ডেমো/নকল ডেটা দিয়ে রেজাল্ট দেখানোর জন্য setTimeout ব্যবহার করা হলো
-    // আসল API কল এইখানে যাবে, কিন্তু আমি ডেমো ডেটা ব্যবহার করছি।
-    setTimeout(() => {
-        // একটি নকল/ডেমো রেজাল্ট ডেটা
-        const mockResult = [{
-            name: "Rahul Sharma",
-            father_name: "Om Prakash Sharma",
-            mobile: mobile,
-            alt_mobile: "9876543210",
-            circle: "West Bengal",
-            aadhaar_number: "XXXX XXXX 1234",
-            address: "12/A, Park Street, Kolkata - 700016",
-            email: "rahul.s@example.com"
-        }];
-
-        let html = '';
-        mockResult.forEach(item => {
-            html += `<div class="result-card">
-                <p><i class="fa-solid fa-user"></i><strong>Name:</strong> ${item.name}</p>
-                <p><i class="fa-solid fa-user-pen"></i><strong>Father's Name:</strong> ${item.father_name}</p>
-                <p><i class="fa-solid fa-phone"></i><strong>Mobile:</strong> ${item.mobile}</p>
-                <p><i class="fa-solid fa-phone-volume"></i><strong>Alt Mobile:</strong> ${item.alt_mobile}</p>
-                <p><i class="fa-solid fa-signal"></i><strong>Circle:</strong> ${item.circle}</p>
-                <p><i class="fa-solid fa-id-card"></i><strong>Aadhaar:</strong> ${item.aadhaar_number}</p>
-                <p><i class="fa-solid fa-location-dot"></i><strong>Address:</strong> ${item.address}</p>
-                <p><i class="fa-solid fa-envelope"></i><strong>Email:</strong> ${item.email}</p>
-            </div>`;
-        });
-        output.innerHTML = html;
-
-    }, 1500); // 1.5 সেকেন্ডের পরে রেজাল্ট দেখাবে
+  }catch(err){
+    out.innerHTML=`<div class="error-card">Error: ${err.message}</div>`;
+  }
 }
 </script>
 </body>
