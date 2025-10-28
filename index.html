@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Lookup Pro</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="bg-3d">
+        <div class="dynamic-glow"></div>
+        <div class="particles" id="particles"></div>
+        <div class="flare f1"></div>
+        <div class="flare f2"></div>
+        <div class="flare f3"></div>
+        <div class="flare f4"></div>
+        <div class="flare f5"></div>
+    </div>
+
+    <div class="shell" role="main" aria-label="Number lookup app">
+        <section class="card" aria-labelledby="lookupTitle">
+            <div class="heading">
+                <div class="logo" aria-hidden="true">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+                <div>
+                    <h1 id="lookupTitle" class="title">NUMBER LOOKUP</h1>
+                    <div class="subtitle">Enter 10-digit mobile number</div>
+                </div>
+            </div>
+
+            <div class="search-row" role="search">
+                <div class="input">
+                    <i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i>
+                    <input id="mobileNumber" type="tel" inputmode="numeric" maxlength="10" 
+                           aria-label="Mobile number input" placeholder="10-digit phone number">
+                </div>
+                <button id="searchBtn" class="btn" aria-label="Lookup">Search</button>
+            </div>
+
+            <div class="results-area">
+                <div id="resultsWrap" class="results-wrap" aria-live="polite" aria-atomic="true"></div>
+            </div>
+
+            <div class="notice">© Secure Lookup Pro</div>
+        </section>
+
+        <aside class="info-panel" aria-label="info panel">
+            <div class="hint">Quick tips</div>
+            <small>• Enter valid 10-digit number</small>
+            <small>• Shows personal & SIM details</small>
+            <small>• Data depends on API availability</small>
+            <div class="security-note">Secure • Encrypted • Mobile Optimized</div>
+        </aside>
+    </div>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
