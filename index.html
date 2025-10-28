@@ -124,10 +124,42 @@ button.search-btn:hover{
 </head>
 
 <body>
-<!-- 🎵 Background Music -->
-<audio autoplay loop>
-  <source src="music.mp3" type="audio/mpeg">
-</audio>
+<body>
+  <!-- এখানে তোমার 3D ব্যাকগ্রাউন্ড, ইনপুট ফিল্ড ইত্যাদি থাকবে -->
+
+  <!-- 🎵 Background Music Button -->
+  <button id="musicBtn" 
+  style="position:fixed;bottom:20px;right:20px;z-index:9999;
+  background:#00ffaa;color:#000;border:none;border-radius:50%;
+  width:60px;height:60px;font-size:22px;
+  box-shadow:0 0 20px rgba(0,255,170,0.6);cursor:pointer;">
+    🎵
+  </button>
+
+  <audio id="bgMusic" loop>
+    <source src="music.mp3" type="audio/mpeg">
+  </audio>
+
+  <script>
+    const music = document.getElementById('bgMusic');
+    const btn = document.getElementById('musicBtn');
+    let playing = false;
+
+    btn.addEventListener('click', () => {
+      if(!playing){
+        music.play();
+        playing = true;
+        btn.innerText = '⏸️';
+      } else {
+        music.pause();
+        playing = false;
+        btn.innerText = '🎵';
+      }
+    });
+  </script>
+
+  <!-- 🎵 এখানেই কোড শেষ -->
+</body>
 
 <!-- 3D Background -->
 <div class="voxel-field" id="voxel-field"></div>
