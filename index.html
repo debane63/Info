@@ -4,9 +4,568 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Number Lookup Pro</title>
-    <link rel="stylesheet" href="css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #000;
+            --card-bg: rgba(12,14,18,0.85);
+            --glass-border: rgba(255,255,255,0.08);
+            --accent-1: #00e6c3;
+            --accent-2: #007bff;
+            --accent-3: #ff007f;
+            --accent-4: #ffd200;
+            --accent-5: #9d4edd;
+            --muted: #88a9a1;
+            --text: #e9fff7;
+            --radius: 24px;
+            --transition: 300ms cubic-bezier(.2,.9,.2,1);
+            --shadow-3d: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background: var(--bg-dark);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow: hidden;
+            perspective: 1000px;
+            position: relative;
+        }
+
+        /* Background Effects */
+        .bg-3d {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -5;
+            background: radial-gradient(ellipse at center, #0a0e17 0%, #000000 70%);
+            overflow: hidden;
+        }
+
+        .dynamic-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0, 230, 195, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 123, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 0, 127, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 60% 60%, rgba(255, 210, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 30% 70%, rgba(157, 78, 221, 0.1) 0%, transparent 50%);
+            background-size: 400% 400%;
+            animation: gradientGlow 15s ease infinite, colorShift 20s infinite;
+            mix-blend-mode: overlay;
+            filter: blur(40px);
+        }
+
+        @keyframes gradientGlow {
+            0% { background-position: 0% 50%; opacity: 0.7; }
+            50% { background-position: 100% 50%; opacity: 0.9; }
+            100% { background-position: 0% 50%; opacity: 0.7; }
+        }
+
+        @keyframes colorShift {
+            0% { filter: blur(40px) hue-rotate(0deg); }
+            100% { filter: blur(40px) hue-rotate(360deg); }
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            animation: floatParticle 20s infinite linear;
+            filter: blur(15px);
+        }
+
+        @keyframes floatParticle {
+            0% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0.3; }
+            50% { opacity: 0.7; }
+            100% { transform: translate3d(100px, 100px, 100px) rotate(360deg); opacity: 0.3; }
+        }
+
+        .flare {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            z-index: -3;
+            pointer-events: none;
+            mix-blend-mode: screen;
+            animation: flarePulse 8s infinite alternate;
+        }
+
+        @keyframes flarePulse {
+            0% { transform: scale(1); opacity: 0.4; }
+            100% { transform: scale(1.2); opacity: 0.7; }
+        }
+
+        .f1 { width: 400px; height: 400px; left: 10%; top: 15%; background: radial-gradient(circle, var(--accent-1), transparent 60%); animation: f1move 25s ease-in-out infinite, flarePulse 7s infinite alternate, colorChange 12s infinite; }
+        .f2 { width: 350px; height: 350px; right: 10%; top: 25%; background: radial-gradient(circle, var(--accent-2), transparent 60%); animation: f2move 30s ease-in-out infinite, flarePulse 9s infinite alternate, colorChange 15s infinite; }
+        .f3 { width: 380px; height: 380px; left: 60%; top: 65%; background: radial-gradient(circle, var(--accent-3), transparent 60%); animation: f3move 28s ease-in-out infinite, flarePulse 8s infinite alternate, colorChange 18s infinite; }
+        .f4 { width: 320px; height: 320px; left: 15%; bottom: 10%; background: radial-gradient(circle, var(--accent-4), transparent 60%); animation: f4move 32s ease-in-out infinite, flarePulse 10s infinite alternate, colorChange 14s infinite; }
+        .f5 { width: 360px; height: 360px; right: 15%; bottom: 15%; background: radial-gradient(circle, var(--accent-5), transparent 60%); animation: f5move 26s ease-in-out infinite, flarePulse 11s infinite alternate, colorChange 16s infinite; }
+
+        @keyframes f1move { 0%{transform: translate3d(0,0,0)} 50%{transform: translate3d(60px,-40px,30px)} 100%{transform: translate3d(0,0,0)} }
+        @keyframes f2move { 0%{transform: translate3d(0,0,0)} 50%{transform: translate3d(-50px,60px,-25px)} 100%{transform: translate3d(0,0,0)} }
+        @keyframes f3move { 0%{transform: translate3d(0,0,0)} 50%{transform: translate3d(-60px,-30px,20px)} 100%{transform: translate3d(0,0,0)} }
+        @keyframes f4move { 0%{transform: translate3d(0,0,0)} 50%{transform: translate3d(40px,-60px,-35px)} 100%{transform: translate3d(0,0,0)} }
+        @keyframes f5move { 0%{transform: translate3d(0,0,0)} 50%{transform: translate3d(50px,40px,25px)} 100%{transform: translate3d(0,0,0)} }
+
+        @keyframes colorChange {
+            0% { filter: blur(80px) hue-rotate(0deg); }
+            100% { filter: blur(80px) hue-rotate(360deg); }
+        }
+
+        .shell {
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform-style: preserve-3d;
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius);
+            padding: 24px;
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: var(--shadow-3d), 
+                        0 0 0 1px rgba(255,255,255,0.05) inset,
+                        0 8px 32px 0 rgba(0, 0, 0, 0.5),
+                        0 0 100px rgba(0, 230, 195, 0.1);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            transform-style: preserve-3d;
+            transform: translateZ(10px);
+            transition: all var(--transition);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            z-index: 2;
+        }
+
+        .card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 30%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .heading {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            margin-bottom: 20px;
+            transform: translateZ(20px);
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 18px;
+            display: grid;
+            place-items: center;
+            background: conic-gradient(from 0deg, var(--accent-1), var(--accent-2), var(--accent-3), var(--accent-4), var(--accent-5));
+            color: #001;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            box-shadow: inset 0 6px 18px rgba(0,0,0,0.45), 
+                        0 8px 20px rgba(0,0,0,0.3),
+                        0 0 0 1px rgba(255,255,255,0.1),
+                        0 0 30px rgba(0, 230, 195, 0.3);
+            transform: translateZ(30px);
+            position: relative;
+            overflow: hidden;
+            animation: logoRotate 15s linear infinite;
+        }
+
+        @keyframes logoRotate {
+            0% { filter: hue-rotate(0deg) brightness(1.2); }
+            100% { filter: hue-rotate(360deg) brightness(1.2); }
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(to bottom right, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 50%);
+            transform: rotate(30deg);
+        }
+
+        .logo i {
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+        }
+
+        .title {
+            font-weight: 700;
+            font-size: 20px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2), var(--accent-3));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: 0.8px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .input {
+            flex: 1;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            background: rgba(6,8,10,0.6);
+            padding: 16px;
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.05) inset;
+            transform: translateZ(5px);
+            transition: all var(--transition);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .input::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .input:focus-within::before {
+            left: 100%;
+        }
+
+        .input i {
+            color: var(--accent-1);
+            font-size: 20px;
+            text-shadow: 0 0 10px rgba(0,230,195,0.5);
+        }
+
+        .input input {
+            border: none;
+            outline: none;
+            background: transparent;
+            color: var(--text);
+            font-size: 16px;
+            width: 100%;
+            text-shadow: 0 0 5px rgba(255,255,255,0.1);
+        }
+
+        .input input::placeholder {
+            color: #7faea4;
+        }
+
+        .btn {
+            padding: 16px 20px;
+            border-radius: 18px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2), var(--accent-3));
+            color: #001;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.5), 
+                        0 4px 10px rgba(0,0,0,0.3), 
+                        0 0 20px rgba(0, 230, 195, 0.3);
+            transition: transform var(--transition), box-shadow var(--transition);
+            transform: translateZ(10px);
+            position: relative;
+            overflow: hidden;
+            font-size: 16px;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:active {
+            transform: translateZ(5px) scale(.98);
+        }
+
+        .info-panel {
+            background: rgba(255,255,255,0.05);
+            border-radius: var(--radius);
+            padding: 18px;
+            border: 1px solid rgba(255,255,255,0.15);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            align-items: flex-start;
+            box-shadow: var(--shadow-3d), 0 0 0 1px rgba(255,255,255,0.05) inset;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            transform: translateZ(5px);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .info-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .info-panel small {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .hint {
+            font-weight: 700;
+            color: var(--text);
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .security-note {
+            margin-top: auto;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .results-area {
+            max-height: 300px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            width: 100%;
+            margin-top: 16px;
+            padding-right: 4px;
+            position: relative;
+        }
+
+        .results-area::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .results-area::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+
+        .results-area::-webkit-scrollbar-thumb {
+            background: var(--accent-1);
+            border-radius: 10px;
+        }
+
+        .results-area::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-2);
+        }
+
+        .results-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding-bottom: 10px;
+        }
+
+        .result-card {
+            background: rgba(255,255,255,0.06);
+            border-radius: 18px;
+            padding: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: var(--shadow-3d), 0 0 0 1px rgba(255,255,255,0.03) inset;
+            transform-origin: center;
+            transform: translateZ(0) rotateX(5deg);
+            opacity: 0;
+            translate: 0 10px;
+            transition: opacity 420ms ease, transform 420ms ease, box-shadow 200ms ease;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .result-card.visible {
+            opacity: 1;
+            transform: translateZ(15px) rotateX(0deg) translateY(0);
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .result-title {
+            font-weight: 700;
+            color: var(--accent-2);
+            font-size: 15px;
+            text-shadow: 0 2px 8px rgba(0,123,255,0.3);
+        }
+
+        .result-meta {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px 12px;
+            align-items: center;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            border-top: 1px dashed rgba(255,255,255,0.05);
+            position: relative;
+            z-index: 2;
+        }
+
+        .group .k {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .group .v {
+            color: var(--text);
+            font-weight: 600;
+            font-size: 13px;
+            text-shadow: 0 1px 5px rgba(255,255,255,0.1);
+        }
+
+        .notice {
+            font-size: 14px;
+            color: var(--muted);
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .loader {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.07);
+            border-top: 3px solid var(--accent-1);
+            animation: spin 1s linear infinite;
+            box-shadow: 0 0 15px rgba(0,230,195,0.3);
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            .shell {
+                padding: 10px;
+                gap: 15px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .search-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .group {
+                grid-template-columns: 1fr;
+                gap: 6px;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="bg-3d">
@@ -56,6 +615,212 @@
         </aside>
     </div>
 
-    <script src="js/script.js"></script>
+    <script>
+        class NumberLookup {
+            constructor() {
+                this.init();
+            }
+
+            init() {
+                this.searchBtn = document.getElementById('searchBtn');
+                this.mobileInput = document.getElementById('mobileNumber');
+                this.resultsWrap = document.getElementById('resultsWrap');
+                
+                this.bindEvents();
+                this.createParticles();
+            }
+
+            bindEvents() {
+                this.searchBtn.addEventListener('click', () => this.onSearch());
+                this.mobileInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') this.onSearch();
+                });
+                
+                if ('vibrate' in navigator) {
+                    this.searchBtn.addEventListener('touchstart', () => {
+                        navigator.vibrate(10);
+                    });
+                }
+            }
+
+            escapeHtml(unsafe) {
+                return unsafe?.replace(/[&<"'>]/g, c => ({
+                    '&': '&amp;',
+                    '<': '&lt;', 
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                }[c])) || '';
+            }
+
+            onSearch() {
+                const number = this.mobileInput.value.trim();
+                
+                if (!this.validateNumber(number)) {
+                    this.showError('Please enter a valid 10-digit number');
+                    return;
+                }
+
+                this.fetchLookup(number);
+            }
+
+            validateNumber(number) {
+                return /^\d{10}$/.test(number);
+            }
+
+            showLoader() {
+                this.resultsWrap.innerHTML = '';
+                const loaderCard = document.createElement('div');
+                loaderCard.className = 'result-card visible';
+                loaderCard.innerHTML = `
+                    <div style="display:flex;gap:14px;align-items:center">
+                        <div class="loader" aria-hidden="true"></div>
+                        <div style="color:var(--muted)">Fetching results…</div>
+                    </div>
+                `;
+                this.resultsWrap.appendChild(loaderCard);
+            }
+
+            showError(message) {
+                this.resultsWrap.innerHTML = '';
+                const card = document.createElement('div');
+                card.className = 'result-card visible';
+                card.innerHTML = `
+                    <div class="result-header">
+                        <div class="result-title">No results</div>
+                        <div class="result-meta">lookup</div>
+                    </div>
+                    <div class="group">
+                        <div class="k">Error</div>
+                        <div class="v">${this.escapeHtml(message)}</div>
+                    </div>
+                `;
+                this.resultsWrap.appendChild(card);
+            }
+
+            renderResults(items) {
+                this.resultsWrap.innerHTML = '';
+                
+                items.forEach((item, index) => {
+                    const card = document.createElement('article');
+                    card.className = 'result-card';
+                    card.innerHTML = this.createResultCardHTML(item);
+                    this.resultsWrap.appendChild(card);
+
+                    setTimeout(() => card.classList.add('visible'), 120 * index + 80);
+                });
+            }
+
+            createResultCardHTML(data) {
+                const metaTime = new Date().toLocaleString();
+                
+                return `
+                    <div class="result-header">
+                        <div class="result-title">Lookup Result</div>
+                        <div class="result-meta">${this.escapeHtml(data.mobile || '—')} • ${metaTime}</div>
+                    </div>
+
+                    <div class="group">
+                        <div class="k">Name</div>
+                        <div class="v">${this.escapeHtml(data.name || 'N/A')}</div>
+                        <div class="k">Father</div>
+                        <div class="v">${this.escapeHtml(data.father_name || 'N/A')}</div>
+                        <div class="k">Mother</div>
+                        <div class="v">${this.escapeHtml(data.mother_name || 'N/A')}</div>
+                        <div class="k">DOB</div>
+                        <div class="v">${this.escapeHtml(data.dob || 'N/A')}</div>
+                    </div>
+                    
+                    <div class="group">
+                        <div class="k">Gender</div>
+                        <div class="v">${this.escapeHtml(data.gender || 'N/A')}</div>
+                        <div class="k">Aadhaar</div>
+                        <div class="v">${this.escapeHtml(data.aadhaar_number || 'Not Linked')}</div>
+                        <div class="k">Email</div>
+                        <div class="v">${this.escapeHtml(data.email || 'N/A')}</div>
+                        <div class="k">SIM Type</div>
+                        <div class="v">${this.escapeHtml(data.sim_type || 'N/A')}</div>
+                    </div>
+
+                    <div class="group">
+                        <div class="k">Circle</div>
+                        <div class="v">${this.escapeHtml(data.circle || 'N/A')}</div>
+                        <div class="k">Registered On</div>
+                        <div class="v">${this.escapeHtml(data.registered_on || 'N/A')}</div>
+                        <div class="k">Location</div>
+                        <div class="v">${this.escapeHtml(data.location || 'N/A')}</div>
+                        <div class="k">Address</div>
+                        <div class="v">${this.escapeHtml(data.address || 'N/A')}</div>
+                    </div>
+                `;
+            }
+
+            async fetchLookup(number) {
+                this.showLoader();
+                
+                try {
+                    const url = `https://n2d.vercel.app/api?key=freeApi&number=${encodeURIComponent(number)}`;
+                    const response = await fetch(url, { cache: 'no-store' });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data?.status === 'success' && Array.isArray(data.data) && data.data.length) {
+                        this.renderResults(data.data);
+                    } else {
+                        this.showError('No data found for this number');
+                    }
+                } catch (error) {
+                    console.error('Lookup error:', error);
+                    this.showError('Network or API error. Please try again.');
+                }
+            }
+
+            createParticles() {
+                const particlesContainer = document.getElementById('particles');
+                const particleCount = 15;
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('particle');
+                    
+                    const size = Math.random() * 120 + 60;
+                    const posX = Math.random() * 100;
+                    const posY = Math.random() * 100;
+                    const delay = Math.random() * 20;
+                    const duration = Math.random() * 25 + 15;
+                    const colors = [
+                        'rgba(0, 230, 195, 0.1)',
+                        'rgba(0, 123, 255, 0.1)',
+                        'rgba(255, 0, 127, 0.1)',
+                        'rgba(255, 210, 0, 0.1)',
+                        'rgba(157, 78, 221, 0.1)'
+                    ];
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.left = `${posX}%`;
+                    particle.style.top = `${posY}%`;
+                    particle.style.background = color;
+                    particle.style.animationDelay = `${delay}s`;
+                    particle.style.animationDuration = `${duration}s`;
+                    
+                    particlesContainer.appendChild(particle);
+                }
+            }
+        }
+
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            document.documentElement.style.setProperty('--transition', '0ms');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            new NumberLookup();
+        });
+    </script>
 </body>
 </html>
