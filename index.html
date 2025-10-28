@@ -611,4 +611,56 @@ function renderResults(items){
         </div>
         <div class="group-row">
           <div class="k">Registered On</div>
-          <div class="v">${escapeHtml(it.r
+          <div class="v">${escapeHtml(it.registered_on||'N/A')}</div>
+        </div>
+        <div class="group-row">
+          <div class="k">Location</div>
+          <div class="v">${escapeHtml(it.location||'N/A')}</div>
+        </div>
+        <div class="group-row">
+          <div class="k">Address</div>
+          <div class="v">${escapeHtml(it.address||'N/A')}</div>
+        </div>
+      </div>
+    `;
+
+    resultsWrap.appendChild(card);
+
+    // staggered reveal for pro feeling
+    setTimeout(() => card.classList.add('visible'), 120 * idx + 80);
+  });
+}
+
+/* Fetch function (uses same example API used earlier) */
+async function fetchLookup(number){
+  showLoader();
+  try{
+    // Replace the URL with your real API if you have one.
+    const url = `https://n2d.vercel.app/api?key=freeApi&number=${encodeURIComponent(number)}`;
+    const res = await fetch(url, {cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    // Expecting { status: 'success', data: [ ... ] } as before
+    if(data && data.status === 'success' && Array.isArray(data.data) && data.data.length){
+      renderResults(data.data);
+    } else {
+      showError('No data found for this number');
+    }
+  } catch(err){
+    console.error(err);
+    showError('Network or API error');
+  }
+}
+
+// Initialize particles on load
+document.addEventListener('DOMContentLoaded', createParticles);
+
+// Add haptic feedback for mobile
+if ('vibrate' in navigator) {
+  searchBtn.addEventListener('touchstart', () => {
+    navigator.vibrate(10);
+  });
+}
+</script>
+</body>
+</html>
