@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Number Lookup Pro</title>
+    <title>Secure Number Lookup</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@600&display=swap" rel="stylesheet">
     <style>
@@ -45,11 +45,11 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             overflow: hidden;
-            perspective: 1000px;
             position: relative;
+            touch-action: pan-y pinch-zoom;
         }
 
-        /* Background Effects */
+        /* Simplified Background Effects */
         .bg-3d {
             position: fixed;
             top: 0;
@@ -61,113 +61,81 @@
             overflow: hidden;
         }
 
-        .dynamic-glow {
+        .login-bg {
+            background: radial-gradient(ellipse at center, #1a0b2e 0%, #000000 70%);
+        }
+
+        .main-bg {
+            background: radial-gradient(ellipse at center, #0a1f2e 0%, #000000 70%);
+        }
+
+        .simple-glow {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: 
-                radial-gradient(circle at 20% 80%, rgba(0, 230, 195, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(0, 123, 255, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(255, 0, 127, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 60% 60%, rgba(255, 210, 0, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 30% 70%, rgba(157, 78, 221, 0.1) 0%, transparent 50%);
-            background-size: 400% 400%;
-            animation: gradientGlow 15s ease infinite, colorShift 20s infinite;
+                radial-gradient(circle at 20% 20%, rgba(157, 78, 221, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 123, 255, 0.1) 0%, transparent 50%);
             mix-blend-mode: overlay;
             filter: blur(40px);
+            opacity: 0.6;
         }
 
-        @keyframes gradientGlow {
-            0% { background-position: 0% 50%; opacity: 0.7; }
-            50% { background-position: 100% 50%; opacity: 0.9; }
-            100% { background-position: 0% 50%; opacity: 0.7; }
-        }
-
-        @keyframes colorShift {
-            0% { filter: blur(40px) hue-rotate(0deg); }
-            100% { filter: blur(40px) hue-rotate(360deg); }
-        }
-
-        .particles {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-        }
-
-        .particle {
-            position: absolute;
-            border-radius: 50%;
-            animation: floatParticle 20s infinite linear;
-            filter: blur(15px);
-        }
-
-        @keyframes floatParticle {
-            0% { transform: translate3d(0, 0, 0) rotate(0deg); opacity: 0.3; }
-            50% { opacity: 0.7; }
-            100% { transform: translate3d(100px, 100px, 100px) rotate(360deg); opacity: 0.3; }
-        }
-
+        /* Reduced number of flares for performance */
         .flare {
             position: fixed;
             border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.6;
+            filter: blur(60px);
+            opacity: 0.4;
             z-index: -3;
             pointer-events: none;
             mix-blend-mode: screen;
-            animation: flarePulse 8s infinite alternate;
         }
 
-        @keyframes flarePulse {
-            0% { transform: scale(1); opacity: 0.4; }
-            100% { transform: scale(1.2); opacity: 0.7; }
+        .login-flare {
+            animation: simplePulse 8s ease-in-out infinite;
         }
 
-        .f1 { width: 400px; height: 400px; left: 10%; top: 15%; background: radial-gradient(circle, var(--accent-1), transparent 60%); animation: f1move 25s ease-in-out infinite, flarePulse 7s infinite alternate, colorChange 12s infinite; }
-        .f2 { width: 350px; height: 350px; right: 10%; top: 25%; background: radial-gradient(circle, var(--accent-2), transparent 60%); animation: f2move 30s ease-in-out infinite, flarePulse 9s infinite alternate, colorChange 15s infinite; }
-        .f3 { width: 380px; height: 380px; left: 60%; top: 65%; background: radial-gradient(circle, var(--accent-3), transparent 60%); animation: f3move 28s ease-in-out infinite, flarePulse 8s infinite alternate, colorChange 18s infinite; }
-        .f4 { width: 320px; height: 320px; left: 15%; bottom: 10%; background: radial-gradient(circle, var(--accent-4), transparent 60%); animation: f4move 32s ease-in-out infinite, flarePulse 10s infinite alternate, colorChange 14s infinite; }
-        .f5 { width: 360px; height: 360px; right: 15%; bottom: 15%; background: radial-gradient(circle, var(--accent-5), transparent 60%); animation: f5move 26s ease-in-out infinite, flarePulse 11s infinite alternate, colorChange 16s infinite; }
-
-        @keyframes f1move { 0%{transform: translate3d(0,0,0)} 50%{transform: translate3d(60px,-40px,30px)} 100%{transform: translate3d(0,0,0)} }
-        @keyframes f2move { 0%{transform: translate3d(0,0,0)} 50%{transform: translate3d(-50px,60px,-25px)} 100%{transform: translate3d(0,0,0)} }
-        @keyframes f3move { 0%{transform: translate3d(0,0,0)} 50%{transform: translate3d(-60px,-30px,20px)} 100%{transform: translate3d(0,0,0)} }
-        @keyframes f4move { 0%{transform: translate3d(0,0,0)} 50%{transform: translate3d(40px,-60px,-35px)} 100%{transform: translate3d(0,0,0)} }
-        @keyframes f5move { 0%{transform: translate3d(0,0,0)} 50%{transform: translate3d(50px,40px,25px)} 100%{transform: translate3d(0,0,0)} }
-
-        @keyframes colorChange {
-            0% { filter: blur(80px) hue-rotate(0deg); }
-            100% { filter: blur(80px) hue-rotate(360deg); }
+        .main-flare {
+            animation: simplePulse 6s ease-in-out infinite;
         }
 
+        @keyframes simplePulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.1); }
+        }
+
+        .lf1 { width: 300px; height: 300px; left: 10%; top: 20%; background: radial-gradient(circle, #9d4edd, transparent 60%); }
+        .lf2 { width: 250px; height: 250px; right: 10%; top: 30%; background: radial-gradient(circle, #007bff, transparent 60%); }
+
+        .mf1 { width: 280px; height: 280px; left: 15%; top: 25%; background: radial-gradient(circle, var(--accent-1), transparent 60%); }
+        .mf2 { width: 220px; height: 220px; right: 15%; top: 35%; background: radial-gradient(circle, var(--accent-2), transparent 60%); }
+
+        /* Shell Layout */
         .shell {
             width: 100%;
             max-width: 400px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            transform-style: preserve-3d;
             gap: 20px;
             position: relative;
             z-index: 1;
         }
 
+        /* Card Styles */
         .card {
             background: rgba(255, 255, 255, 0.08);
             border-radius: var(--radius);
-            padding: 24px;
-            border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: var(--shadow-3d), 
-                        0 0 0 1px rgba(255,255,255,0.05) inset,
-                        0 8px 32px 0 rgba(0, 0, 0, 0.5),
-                        0 0 100px rgba(0, 230, 195, 0.1);
-            backdrop-filter: blur(40px) saturate(200%);
-            -webkit-backdrop-filter: blur(40px) saturate(200%);
-            transform-style: preserve-3d;
-            transform: translateZ(10px);
-            transition: all var(--transition);
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255,255,255,0.05) inset;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
             position: relative;
             overflow: hidden;
             width: 100%;
@@ -180,130 +148,92 @@
             left: 0;
             right: 0;
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
             z-index: 2;
         }
 
-        .card::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 30%);
-            pointer-events: none;
-            z-index: 1;
+        /* Login Page Specific Styles */
+        #loginPage {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        #mainApp {
+            display: none;
         }
 
         .heading {
             display: flex;
-            gap: 14px;
+            gap: 12px;
             align-items: center;
-            margin-bottom: 20px;
-            transform: translateZ(20px);
+            margin-bottom: 15px;
         }
 
         .logo {
-            width: 60px;
-            height: 60px;
-            border-radius: 18px;
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
             display: grid;
             place-items: center;
-            background: conic-gradient(from 0deg, var(--accent-1), var(--accent-2), var(--accent-3), var(--accent-4), var(--accent-5));
+            background: conic-gradient(from 0deg, var(--accent-1), var(--accent-2), var(--accent-3));
             color: #001;
             font-weight: 700;
             font-family: 'Orbitron', sans-serif;
-            font-size: 20px;
-            box-shadow: inset 0 6px 18px rgba(0,0,0,0.45), 
-                        0 8px 20px rgba(0,0,0,0.3),
-                        0 0 0 1px rgba(255,255,255,0.1),
-                        0 0 30px rgba(0, 230, 195, 0.3);
-            transform: translateZ(30px);
-            position: relative;
-            overflow: hidden;
-            animation: logoRotate 15s linear infinite;
-        }
-
-        @keyframes logoRotate {
-            0% { filter: hue-rotate(0deg) brightness(1.2); }
-            100% { filter: hue-rotate(360deg) brightness(1.2); }
-        }
-
-        .logo::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(to bottom right, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 50%);
-            transform: rotate(30deg);
-        }
-
-        .logo i {
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+            font-size: 18px;
+            box-shadow: 
+                inset 0 4px 12px rgba(0,0,0,0.3),
+                0 6px 16px rgba(0,0,0,0.2);
         }
 
         .title {
             font-weight: 700;
-            font-size: 20px;
-            background: linear-gradient(135deg, var(--accent-1), var(--accent-2), var(--accent-3));
+            font-size: 18px;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            letter-spacing: 0.8px;
         }
 
         .subtitle {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--muted);
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
-        .search-row {
+        /* Form Styles */
+        .form-group {
             display: flex;
+            flex-direction: column;
             gap: 12px;
-            align-items: center;
-            margin-bottom: 16px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-label {
+            font-size: 13px;
+            color: var(--muted);
+            font-weight: 600;
         }
 
         .input {
-            flex: 1;
             display: flex;
-            gap: 12px;
+            gap: 10px;
             align-items: center;
             background: rgba(6,8,10,0.6);
-            padding: 16px;
-            border-radius: 18px;
-            border: 1px solid rgba(255,255,255,0.15);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.05) inset;
-            transform: translateZ(5px);
+            padding: 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.1);
             transition: all var(--transition);
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(10px);
-        }
-
-        .input::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .input:focus-within::before {
-            left: 100%;
         }
 
         .input i {
             color: var(--accent-1);
-            font-size: 20px;
-            text-shadow: 0 0 10px rgba(0,230,195,0.5);
+            font-size: 18px;
         }
 
         .input input {
@@ -311,9 +241,8 @@
             outline: none;
             background: transparent;
             color: var(--text);
-            font-size: 16px;
+            font-size: 15px;
             width: 100%;
-            text-shadow: 0 0 5px rgba(255,255,255,0.1);
         }
 
         .input input::placeholder {
@@ -321,102 +250,76 @@
         }
 
         .btn {
-            padding: 16px 20px;
-            border-radius: 18px;
+            padding: 14px 18px;
+            border-radius: 14px;
             border: none;
             font-weight: 700;
             cursor: pointer;
-            background: linear-gradient(135deg, var(--accent-1), var(--accent-2), var(--accent-3));
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
             color: #001;
-            box-shadow: 0 12px 30px rgba(0,0,0,0.5), 
-                        0 4px 10px rgba(0,0,0,0.3), 
-                        0 0 20px rgba(0, 230, 195, 0.3);
-            transition: transform var(--transition), box-shadow var(--transition);
-            transform: translateZ(10px);
-            position: relative;
-            overflow: hidden;
-            font-size: 16px;
-        }
-
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            transition: transform var(--transition);
+            font-size: 15px;
             width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .btn:hover::before {
-            left: 100%;
         }
 
         .btn:active {
-            transform: translateZ(5px) scale(.98);
+            transform: scale(0.98);
         }
 
-        .info-panel {
-            background: rgba(255,255,255,0.05);
-            border-radius: var(--radius);
-            padding: 18px;
-            border: 1px solid rgba(255,255,255,0.15);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            align-items: flex-start;
-            box-shadow: var(--shadow-3d), 0 0 0 1px rgba(255,255,255,0.05) inset;
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            transform: translateZ(5px);
-            position: relative;
-            overflow: hidden;
-            width: 100%;
-        }
-
-        .info-panel::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .info-panel small {
-            color: var(--muted);
-            font-size: 14px;
-        }
-
-        .hint {
-            font-weight: 700;
-            color: var(--text);
-            font-size: 16px;
-            margin-bottom: 8px;
-        }
-
-        .security-note {
-            margin-top: auto;
+        .error-message {
+            color: #ff4444;
             font-size: 13px;
-            color: var(--muted);
+            text-align: center;
+            margin-top: 8px;
+            display: none;
         }
 
+        /* Telegram Link Styles */
+        .telegram-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 14px;
+            background: rgba(0, 136, 204, 0.1);
+            border: 1px solid rgba(0, 136, 204, 0.2);
+            border-radius: 10px;
+            color: #0088cc;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all var(--transition);
+            margin-top: 8px;
+        }
+
+        .telegram-link:hover {
+            background: rgba(0, 136, 204, 0.2);
+        }
+
+        /* Improved Main App Styles */
+        .search-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        /* Optimized Results Area */
         .results-area {
-            max-height: 300px;
+            height: 350px;
             overflow-y: auto;
             overflow-x: hidden;
             width: 100%;
-            margin-top: 16px;
-            padding-right: 4px;
+            margin-top: 15px;
             position: relative;
+            border-radius: 12px;
+            background: rgba(0,0,0,0.2);
+            padding: 8px;
         }
 
         .results-area::-webkit-scrollbar {
-            width: 4px;
+            width: 5px;
         }
 
         .results-area::-webkit-scrollbar-track {
@@ -429,116 +332,154 @@
             border-radius: 10px;
         }
 
-        .results-area::-webkit-scrollbar-thumb:hover {
-            background: var(--accent-2);
-        }
-
         .results-wrap {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            padding-bottom: 10px;
+            gap: 10px;
         }
 
+        /* Improved Result Cards */
         .result-card {
             background: rgba(255,255,255,0.06);
-            border-radius: 18px;
-            padding: 16px;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: var(--shadow-3d), 0 0 0 1px rgba(255,255,255,0.03) inset;
-            transform-origin: center;
-            transform: translateZ(0) rotateX(5deg);
-            opacity: 0;
-            translate: 0 10px;
-            transition: opacity 420ms ease, transform 420ms ease, box-shadow 200ms ease;
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-radius: 14px;
+            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.08);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            animation: slideInUp 0.3s ease-out;
+            transform-origin: top;
         }
 
-        .result-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .result-card.visible {
-            opacity: 1;
-            transform: translateZ(15px) rotateX(0deg) translateY(0);
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .result-header {
             display: flex;
             justify-content: space-between;
-            gap: 8px;
             align-items: center;
-            margin-bottom: 12px;
-            position: relative;
-            z-index: 2;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
         .result-title {
             font-weight: 700;
             color: var(--accent-2);
-            font-size: 15px;
-            text-shadow: 0 2px 8px rgba(0,123,255,0.3);
+            font-size: 14px;
         }
 
         .result-meta {
-            font-size: 12px;
+            font-size: 11px;
             color: var(--muted);
         }
 
         .group {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px 12px;
+            gap: 6px 10px;
             align-items: center;
-            padding-top: 8px;
-            padding-bottom: 8px;
-            border-top: 1px dashed rgba(255,255,255,0.05);
-            position: relative;
-            z-index: 2;
         }
 
         .group .k {
             color: var(--muted);
-            font-size: 12px;
+            font-size: 11px;
+            font-weight: 500;
         }
 
         .group .v {
             color: var(--text);
             font-weight: 600;
-            font-size: 13px;
-            text-shadow: 0 1px 5px rgba(255,255,255,0.1);
+            font-size: 12px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
         }
 
         .notice {
-            font-size: 14px;
+            font-size: 13px;
             color: var(--muted);
             text-align: center;
             margin-top: 10px;
         }
 
         .loader {
-            width: 26px;
-            height: 26px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
-            border: 3px solid rgba(255,255,255,0.07);
-            border-top: 3px solid var(--accent-1);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-top: 2px solid var(--accent-1);
             animation: spin 1s linear infinite;
-            box-shadow: 0 0 15px rgba(0,230,195,0.3);
         }
 
         @keyframes spin {
             100% { transform: rotate(360deg); }
+        }
+
+        .info-panel {
+            background: rgba(255,255,255,0.05);
+            border-radius: var(--radius);
+            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            width: 100%;
+        }
+
+        .info-panel small {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .hint {
+            font-weight: 700;
+            color: var(--text);
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .security-note {
+            margin-top: auto;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.1);
+            color: var(--text);
+            border: 1px solid rgba(255,255,255,0.15);
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all var(--transition);
+        }
+
+        .logout-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* No Results State */
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--muted);
+        }
+
+        .no-results i {
+            font-size: 40px;
+            margin-bottom: 10px;
+            opacity: 0.5;
         }
 
         @media (max-width: 480px) {
@@ -548,46 +489,94 @@
             }
             
             .card {
-                padding: 20px;
+                padding: 15px;
             }
             
             .search-row {
                 flex-direction: column;
-                gap: 10px;
+                gap: 8px;
             }
             
-            .btn {
-                width: 100%;
+            .results-area {
+                height: 300px;
             }
             
             .group {
                 grid-template-columns: 1fr;
-                gap: 6px;
+                gap: 4px;
             }
+        }
+
+        /* Performance optimizations */
+        .performance-optimized {
+            will-change: transform;
+            transform: translateZ(0);
         }
     </style>
 </head>
 <body>
-    <div class="bg-3d">
-        <div class="dynamic-glow"></div>
-        <div class="particles" id="particles"></div>
-        <div class="flare f1"></div>
-        <div class="flare f2"></div>
-        <div class="flare f3"></div>
-        <div class="flare f4"></div>
-        <div class="flare f5"></div>
+    <!-- Login Page Background -->
+    <div id="loginBackground" class="bg-3d login-bg">
+        <div class="simple-glow"></div>
+        <div class="flare login-flare lf1"></div>
+        <div class="flare login-flare lf2"></div>
     </div>
 
-    <div class="shell" role="main" aria-label="Number lookup app">
-        <section class="card" aria-labelledby="lookupTitle">
+    <!-- Main App Background -->
+    <div id="mainBackground" class="bg-3d main-bg" style="display: none;">
+        <div class="simple-glow"></div>
+        <div class="flare main-flare mf1"></div>
+        <div class="flare main-flare mf2"></div>
+    </div>
+
+    <div class="shell" role="main">
+        <!-- Login Page -->
+        <section id="loginPage" class="card">
+            <div class="heading">
+                <div class="logo" aria-hidden="true">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <div>
+                    <h1 class="title">SECURE ACCESS</h1>
+                    <div class="subtitle">Enter password to continue</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="input-group">
+                    <label class="input-label">Password</label>
+                    <div class="input">
+                        <i class="fa-solid fa-key" aria-hidden="true"></i>
+                        <input type="password" id="passwordInput" placeholder="Enter your password">
+                    </div>
+                </div>
+                
+                <button id="loginBtn" class="btn">Access System</button>
+                <div id="loginError" class="error-message">Incorrect password. Please try again.</div>
+
+                <!-- Telegram Link -->
+                <a href="https://t.me/CEXIDEX" target="_blank" class="telegram-link">
+                    <i class="fab fa-telegram"></i>
+                    Join Our Telegram
+                </a>
+            </div>
+
+            <div class="notice">Authorized Personnel Only</div>
+        </section>
+
+        <!-- Main App (Hidden until login) -->
+        <section id="mainApp" class="card">
             <div class="heading">
                 <div class="logo" aria-hidden="true">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </div>
                 <div>
-                    <h1 id="lookupTitle" class="title">NUMBER LOOKUP</h1>
+                    <h1 class="title">NUMBER LOOKUP</h1>
                     <div class="subtitle">Enter 10-digit mobile number</div>
                 </div>
+                <button id="logoutBtn" class="logout-btn" title="Logout">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
             </div>
 
             <div class="search-row" role="search">
@@ -600,227 +589,68 @@
             </div>
 
             <div class="results-area">
-                <div id="resultsWrap" class="results-wrap" aria-live="polite" aria-atomic="true"></div>
+                <div id="resultsWrap" class="results-wrap">
+                    <!-- Initial state -->
+                    <div class="no-results">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <div>Enter a number to search</div>
+                    </div>
+                </div>
             </div>
 
             <div class="notice">© Secure Lookup Pro</div>
         </section>
 
+        <!-- Info Panel -->
         <aside class="info-panel" aria-label="info panel">
             <div class="hint">Quick tips</div>
             <small>• Enter valid 10-digit number</small>
             <small>• Shows personal & SIM details</small>
             <small>• Data depends on API availability</small>
-            <div class="security-note">Secure • Encrypted • Mobile Optimized</div>
+            <div class="security-note">Secure • Encrypted • Authorized Access Only</div>
         </aside>
     </div>
 
     <script>
-        class NumberLookup {
+        // Password configuration
+        const CORRECT_PASSWORD = "admin123";
+        
+        class SecureNumberLookup {
             constructor() {
+                this.isLoggedIn = false;
                 this.init();
             }
 
             init() {
+                this.loginPage = document.getElementById('loginPage');
+                this.mainApp = document.getElementById('mainApp');
+                this.loginBackground = document.getElementById('loginBackground');
+                this.mainBackground = document.getElementById('mainBackground');
+                this.passwordInput = document.getElementById('passwordInput');
+                this.loginBtn = document.getElementById('loginBtn');
+                this.loginError = document.getElementById('loginError');
+                this.logoutBtn = document.getElementById('logoutBtn');
                 this.searchBtn = document.getElementById('searchBtn');
                 this.mobileInput = document.getElementById('mobileNumber');
                 this.resultsWrap = document.getElementById('resultsWrap');
                 
                 this.bindEvents();
-                this.createParticles();
+                this.checkLoginStatus();
             }
 
             bindEvents() {
+                // Login events
+                this.loginBtn.addEventListener('click', () => this.handleLogin());
+                this.passwordInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') this.handleLogin();
+                });
+                
+                // Logout event
+                this.logoutBtn.addEventListener('click', () => this.handleLogout());
+                
+                // Search events
                 this.searchBtn.addEventListener('click', () => this.onSearch());
                 this.mobileInput.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter') this.onSearch();
                 });
-                
-                if ('vibrate' in navigator) {
-                    this.searchBtn.addEventListener('touchstart', () => {
-                        navigator.vibrate(10);
-                    });
-                }
-            }
-
-            escapeHtml(unsafe) {
-                return unsafe?.replace(/[&<"'>]/g, c => ({
-                    '&': '&amp;',
-                    '<': '&lt;', 
-                    '>': '&gt;',
-                    '"': '&quot;',
-                    "'": '&#39;'
-                }[c])) || '';
-            }
-
-            onSearch() {
-                const number = this.mobileInput.value.trim();
-                
-                if (!this.validateNumber(number)) {
-                    this.showError('Please enter a valid 10-digit number');
-                    return;
-                }
-
-                this.fetchLookup(number);
-            }
-
-            validateNumber(number) {
-                return /^\d{10}$/.test(number);
-            }
-
-            showLoader() {
-                this.resultsWrap.innerHTML = '';
-                const loaderCard = document.createElement('div');
-                loaderCard.className = 'result-card visible';
-                loaderCard.innerHTML = `
-                    <div style="display:flex;gap:14px;align-items:center">
-                        <div class="loader" aria-hidden="true"></div>
-                        <div style="color:var(--muted)">Fetching results…</div>
-                    </div>
-                `;
-                this.resultsWrap.appendChild(loaderCard);
-            }
-
-            showError(message) {
-                this.resultsWrap.innerHTML = '';
-                const card = document.createElement('div');
-                card.className = 'result-card visible';
-                card.innerHTML = `
-                    <div class="result-header">
-                        <div class="result-title">No results</div>
-                        <div class="result-meta">lookup</div>
-                    </div>
-                    <div class="group">
-                        <div class="k">Error</div>
-                        <div class="v">${this.escapeHtml(message)}</div>
-                    </div>
-                `;
-                this.resultsWrap.appendChild(card);
-            }
-
-            renderResults(items) {
-                this.resultsWrap.innerHTML = '';
-                
-                items.forEach((item, index) => {
-                    const card = document.createElement('article');
-                    card.className = 'result-card';
-                    card.innerHTML = this.createResultCardHTML(item);
-                    this.resultsWrap.appendChild(card);
-
-                    setTimeout(() => card.classList.add('visible'), 120 * index + 80);
-                });
-            }
-
-            createResultCardHTML(data) {
-                const metaTime = new Date().toLocaleString();
-                
-                return `
-                    <div class="result-header">
-                        <div class="result-title">Lookup Result</div>
-                        <div class="result-meta">${this.escapeHtml(data.mobile || '—')} • ${metaTime}</div>
-                    </div>
-
-                    <div class="group">
-                        <div class="k">Name</div>
-                        <div class="v">${this.escapeHtml(data.name || 'N/A')}</div>
-                        <div class="k">Father</div>
-                        <div class="v">${this.escapeHtml(data.father_name || 'N/A')}</div>
-                        <div class="k">Mother</div>
-                        <div class="v">${this.escapeHtml(data.mother_name || 'N/A')}</div>
-                        <div class="k">DOB</div>
-                        <div class="v">${this.escapeHtml(data.dob || 'N/A')}</div>
-                    </div>
-                    
-                    <div class="group">
-                        <div class="k">Gender</div>
-                        <div class="v">${this.escapeHtml(data.gender || 'N/A')}</div>
-                        <div class="k">Aadhaar</div>
-                        <div class="v">${this.escapeHtml(data.aadhaar_number || 'Not Linked')}</div>
-                        <div class="k">Email</div>
-                        <div class="v">${this.escapeHtml(data.email || 'N/A')}</div>
-                        <div class="k">SIM Type</div>
-                        <div class="v">${this.escapeHtml(data.sim_type || 'N/A')}</div>
-                    </div>
-
-                    <div class="group">
-                        <div class="k">Circle</div>
-                        <div class="v">${this.escapeHtml(data.circle || 'N/A')}</div>
-                        <div class="k">Registered On</div>
-                        <div class="v">${this.escapeHtml(data.registered_on || 'N/A')}</div>
-                        <div class="k">Location</div>
-                        <div class="v">${this.escapeHtml(data.location || 'N/A')}</div>
-                        <div class="k">Address</div>
-                        <div class="v">${this.escapeHtml(data.address || 'N/A')}</div>
-                    </div>
-                `;
-            }
-
-            async fetchLookup(number) {
-                this.showLoader();
-                
-                try {
-                    const url = `https://n2d.vercel.app/api?key=freeApi&number=${encodeURIComponent(number)}`;
-                    const response = await fetch(url, { cache: 'no-store' });
-                    
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status}`);
-                    }
-                    
-                    const data = await response.json();
-                    
-                    if (data?.status === 'success' && Array.isArray(data.data) && data.data.length) {
-                        this.renderResults(data.data);
-                    } else {
-                        this.showError('No data found for this number');
-                    }
-                } catch (error) {
-                    console.error('Lookup error:', error);
-                    this.showError('Network or API error. Please try again.');
-                }
-            }
-
-            createParticles() {
-                const particlesContainer = document.getElementById('particles');
-                const particleCount = 15;
-                
-                for (let i = 0; i < particleCount; i++) {
-                    const particle = document.createElement('div');
-                    particle.classList.add('particle');
-                    
-                    const size = Math.random() * 120 + 60;
-                    const posX = Math.random() * 100;
-                    const posY = Math.random() * 100;
-                    const delay = Math.random() * 20;
-                    const duration = Math.random() * 25 + 15;
-                    const colors = [
-                        'rgba(0, 230, 195, 0.1)',
-                        'rgba(0, 123, 255, 0.1)',
-                        'rgba(255, 0, 127, 0.1)',
-                        'rgba(255, 210, 0, 0.1)',
-                        'rgba(157, 78, 221, 0.1)'
-                    ];
-                    const color = colors[Math.floor(Math.random() * colors.length)];
-                    
-                    particle.style.width = `${size}px`;
-                    particle.style.height = `${size}px`;
-                    particle.style.left = `${posX}%`;
-                    particle.style.top = `${posY}%`;
-                    particle.style.background = color;
-                    particle.style.animationDelay = `${delay}s`;
-                    particle.style.animationDuration = `${duration}s`;
-                    
-                    particlesContainer.appendChild(particle);
-                }
-            }
-        }
-
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            document.documentElement.style.setProperty('--transition', '0ms');
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            new NumberLookup();
-        });
-    </script>
-</body>
-</html>
+          
