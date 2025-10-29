@@ -653,4 +653,219 @@
                 this.mobileInput.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter') this.onSearch();
                 });
+                }
+
+            checkLoginStatus() {
+                const savedLogin = localStorage.getItem('numberLookupLoggedIn');
+                if (savedLogin === 'true') {
+                    this.showMainApp();
+                }
+            }
+
+            handleLogin() {
+                const password = this.passwordInput.value.trim();
+                
+                if (!password) {
+                    this.showError('Please enter a password');
+                    return;
+                }
+
+                if (password === CORRECT_PASSWORD) {
+                    this.loginSuccess();
+                } else {
+                    this.loginFailed();
+                }
+            }
+
+            loginSuccess() {
+                this.isLoggedIn = true;
+                localStorage.setItem('numberLookupLoggedIn', 'true');
+                this.showMainApp();
+            }
+
+            loginFailed() {
+                this.showError('Incorrect password. Please try again.');
+                this.passwordInput.value = '';
+                this.passwordInput.focus();
+            }
+
+            handleLogout() {
+                this.isLoggedIn = false;
+                localStorage.removeItem('numberLookupLoggedIn');
+                this.showLoginPage();
+                this.passwordInput.value = '';
+            }
+
+            showLoginPage() {
+                this.loginPage.style.display = 'flex';
+                this.mainApp.style.display = 'none';
+                this.loginBackground.style.display = 'block';
+                this.mainBackground.style.display = 'none';
+                this.passwordInput.focus();
+            }
+
+            showMainApp() {
+                this.loginPage.style.display = 'none';
+                this.mainApp.style.display = 'block';
+                this.loginBackground.style.display = 'none';
+                this.mainBackground.style.display = 'block';
+                this.mobileInput.focus();
+            }
+
+            showError(message) {
+                this.loginError.textContent = message;
+                this.loginError.style.display = 'block';
+                
+                setTimeout(() => {
+                    this.loginError.style.display = 'none';
+                }, 3000);
+            }
+
+            // Utility functions
+            escapeHtml(unsafe) {
+                return unsafe?.replace(/[&<"'>]/g, c => ({
+                    '&': '&amp;',
+                    '<': '&lt;', 
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#39;'
+                }[c])) || '';
+            }
+
+            onSearch() {
+                if (!this.isLoggedIn) {
+                    this.showLoginPage();
+                    return;
+                }
+
+                const number = this.mobileInput.value.trim();
+                
+                if (!this.validateNumber(number)) {
+                    this.showLookupError('Please enter a valid 10-digit number');
+                    return;
+                }
+
+                this.fetchLookup(number);
+            }
+
+            validateNumber(number) {
+                return /^\d{10}$/.test(number);
+            }
+
+            showLoader() {
+                this.resultsWrap.innerHTML = `
+                    <div style="display:flex;gap:12px;align-items:center;justify-content:center;padding:40px;">
+                        <div class="loader"></div>
+                        <div style="color:var(--muted)">Searching database...</div>
+                    </div>
+                `;
+            }
+
+            showLookupError(message) {
+                this.resultsWrap.innerHTML = `
+                    <div class="no-results">
+                        <i class="fa-solid fa-exclamation-triangle"></i>
+                        <div>${this.escapeHtml(message)}</div>
+                    </div>
+                `;
+            }
+
+            renderResults(items) {
+                if (!items || items.length === 0) {
+                    this.showLookupError('No data found for this number');
+                    return;
+                }
+
+                let html = '';
+                items.forEach((item, index) => {
+                    html += this.createResultCardHTML(item, index);
+                });
+                this.resultsWrap.innerHTML = html;
+            }
+
+            createResultCardHTML(data, index) {
+                const metaTime = new Date().toLocaleString();
+                
+                return `
+                    <article class="result-card performance-optimized" style="animation-delay: ${index * 100}ms">
+                        <div class="result-header">
+                            <div class="result-title">Lookup Result</div>
+                            <div class="result-meta">${this.escapeHtml(data.mobile || '—')} • ${metaTime}</div>
+                        </div>
+
+                        <div class="group">
+                            <div class="k">Name</div>
+                            <div class="v">${this.escapeHtml(data.name || 'N/A')}</div>
+                            <div class="k">Father</div>
+                            <div class="v">${this.escapeHtml(data.father_name || 'N/A')}</div>
+                            <div class="k">Mother</div>
+                            <div class="v">${this.escapeHtml(data.mother_name || 'N/A')}</div>
+                            <div class="k">DOB</div>
+                            <div class="v">${this.escapeHtml(data.dob || 'N/A')}</div>
+                        </div>
+                        
+                        <div class="group">
+                            <div class="k">Gender</div>
+                            <div class="v">${this.escapeHtml(data.gender || 'N/A')}</div>
+                            <div class="k">Aadhaar</div>
+                            <div class="v">${this.escapeHtml(data.aadhaar_number || 'Not Linked')}</div>
+                            <div class="k">Email</div>
+                            <div class="v">${this.escapeHtml(data.email || 'N/A')}</div>
+                            <div class="k">SIM Type</div>
+                            <div class="v">${this.escapeHtml(data.sim_type || 'N/A')}</div>
+                        </div>
+
+                        <div class="group">
+                            <div class="k">Circle</div>
+                            <div class="v">${this.escapeHtml(data.circle || 'N/A')}</div>
+                            <div class="k">Registered On</div>
+                            <div class="v">${this.escapeHtml(data.registered_on || 'N/A')}</div>
+                            <div class="k">Location</div>
+                            <div class="v">${this.escapeHtml(data.location || 'N/A')}</div>
+                            <div class="k">Address</div>
+                            <div class="v">${this.escapeHtml(data.address || 'N/A')}</div>
+                        </div>
+                    </article>
+                `;
+            }
+
+            async fetchLookup(number) {
+                this.showLoader();
+                
+                try {
+                    // Simulate API delay for better UX
+                    await new Promise(resolve => setTimeout(resolve, 800));
+                    
+                    const url = `https://n2d.vercel.app/api?key=freeApi&number=${encodeURIComponent(number)}`;
+                    const response = await fetch(url, { cache: 'no-store' });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data?.status === 'success' && Array.isArray(data.data) && data.data.length) {
+                        this.renderResults(data.data);
+                    } else {
+                        this.showLookupError('No data found for this number');
+                    }
+                } catch (error) {
+                    console.error('Lookup error:', error);
+                    this.showLookupError('Network error. Please try again.');
+                }
+            }
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', () => {
+            new SecureNumberLookup();
+        });
+
+        // Set Telegram link
+        const telegramLink = document.querySelector('.telegram-link');
+        telegramLink.href = "https://t.me/CEXIDEX";
+    </script>
+</body>
+</html>
           
